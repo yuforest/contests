@@ -13,12 +13,15 @@ using P = pair<int, int>;
 int main()
 {
 
-  string S[3], T;
-  cin >> S[0] >> S[1] >> S[2] >> T;
-  string ans = "";
-  for (int i = 0; i < T.size(); ++i) {
-    int index = T[i] - '0' - 1;
-    ans += S[index];
+  string S, T;
+  cin >> S >> T;
+  int size = S.size();
+  string ans = "No";
+  rep(i, size) {
+    string rotated = S[size-1] + S.substr(0, size-1);
+    S = rotated;
+    if (rotated == T) ans = "Yes";
   }
   cout << ans << endl;
+
 }
