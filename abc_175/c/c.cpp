@@ -17,13 +17,16 @@ int main(void)
   cin >> X >> K >> D;
   X = abs(X);
 
+  // 移動できる回数と0近くに移動するための回数の小さい方、これが最小値
   ll straight = min(K, X / D);
   K -= straight;
   X -= straight * D;
 
+  // 残り回数が偶数ならその位置のまま
   if (K % 2 == 0) {
     cout << X << endl;
   } else {
+    // 奇数なら0を飛び越えたところに行って終了
     cout << D - X << endl;
   }
 }

@@ -19,74 +19,30 @@ int main()
 {
   int N;
   cin >> N;
+  string S;
+  cin >> S;
 
-  map<int, int> even_mp;
-  map<int, int> odd_mp;
-  int even_max = 0;
-  int even_max_count = 0;
-  int even_second_max = 0;
-  int even_second_max_count = 0;
-  int odd_max = 0;
-  int odd_max_count = 0;
-  int odd_second_max = 0;
-  int odd_second_max_count = 0;
-  int v[N+1];
-  for (int i = 1; i <= N; i++) {
-    int val;
-    cin >> val;
-    v[i] = val;
-    if (i % 2 == 0) {
-      even_mp[val]++;
-    } else {
-      odd_mp[val]++;
-    }
+  int c = 0;
+  // 西を向いている人の数を左から右に数えた累積和
+  int west[N];
+  for (int i = 0; i < N; i++) {
+    if (S[i] == 'W') c++;
+    west[i] = c;
+  }
+  // 東を向いている人の数を右から左に数えた累積和
+  int east[N];
+  c = 0;
+  for (int i = N-1; i >= 0; i--) {
+    if (S[i] == 'E') c++;
+    east[i] = c;
   }
 
-  // コーナーケースのチェック
-  bool is_same = true;
-  for (int i = 1; i < N; i++) {
-    if (v[i] != v[i+1]) {
-      is_same = false;
-    }
-  }
-  if (is_same) {
-    cout << N / 2 << endl;
-    return 0;
-  }
-
-  for (auto x : even_mp) {
-    if (x.second > even_second_max_count) {
-      if (x.second > even_max_count) {
-        even_second_max = even_max;
-        even_second_max_count = even_max_count;
-        even_max = x.first;
-        even_max_count = x.second;
-      } else {
-        even_second_max = x.first;
-        even_second_max_count = x.second;
-      }
-    }
-  }
-  for (auto x : odd_mp) {
-    if (x.second > odd_second_max_count) {
-      if (x.second > odd_max_count) {
-        odd_second_max = odd_max;
-        odd_second_max_count = odd_max_count;
-        odd_max = x.first;
-        odd_max_count = x.second;
-      } else {
-        odd_second_max = x.first;
-        odd_second_max_count = x.second;
-      }
-    }
-  }
-  int ans;
-  if (even_max == odd_max) {
-    int ans1 = N - odd_max_count - even_second_max_count;
-    int ans2 = N - even_max_count - odd_second_max_count;
-    ans = min(ans1, ans2);
-  } else {
-    ans = N - odd_max_count - even_max_count;
+  int ans = 300007;
+  rep(i, N) {
+    int tmp = 0;
+    if (i > 0) tmp += west[i-1];
+    if (i < N-1) tmp += east[i+1];
+    ans = min(ans, tmp);
   }
   cout << ans << endl;
 }

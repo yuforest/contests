@@ -9,16 +9,21 @@ int n, k;
 int c[300005];
 map<int, int> mp;
 long long mod = 1000000007;
+using ll = long long;
 
 int main(void)
 {
-  int S;
-  cin >> S;
-  while {
-    if (S.size() == 4) {
-      break;
-    }
-    S = "0" + S;
+  ll x;
+  cin >> x;
+
+  ll ans = 0;
+  ans += (x / 11) * 2;
+  x -= 11 * (x / 11);
+  if (x > 0 && x % 11 <= 6) {
+    ans += 1;
   }
-  cout << S << endl;
+  if (x > 0 && x % 11 > 6) {
+    ans += 2;
+  }
+  cout << ans << endl;
 }

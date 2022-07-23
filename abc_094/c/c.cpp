@@ -15,30 +15,31 @@ vector<int> G[1 << 18];
 long long K[200007];
 long long T[200007];
 
-void dfs(int pos) {
-  minimum_time += T[pos];
-	used[pos] = true;
 
-	for (int i : G[pos]) {
-		if (used[i] == false) dfs(i);
-	}
-}
 
 int main()
 {
-  vector<vector<int>> c(3, vector<int>(3));
-  rep (i, 3) {
-    rep (j, 3) {
-      cin >> c[i][j];
+  int N;
+  cin >> N;
+  int X[N];
+  int A[N];
+  rep(i, N) cin >> X[i];
+  rep(i, N) A[i] = X[i];
+  // 昇順に並べたもの
+  sort(A, A + N);
+
+  // 昇順に並べた時に特定の数字が最も早く現れるインデックス
+  map<int, int> idx;
+  for (int i = N-1; i >= 0; i--) {
+    idx[A[i]] = i;
+  }
+  rep(i, N) {
+    int j = idx[X[i]];
+    // インデックスが半分以下の位置にあればA[N / 2]が答え
+    if (j < N / 2) {
+      cout << A[N / 2] << endl;
+    } else {
+      cout << A[N / 2 - 1] << endl;
     }
   }
-  bool flag = true;
-
-  for(int i = 0;i<=1;i++) {
-    flag &= (c[i][0] - c[i][1] == c[i+1][0] - c[i+1][1]);
-    flag &= (c[i][1]-c[i][2] == c[i+1][1]-c[i+1][2]);
-    flag &= (c[0][i]-c[1][i] == c[0][i+1]-c[1][i+1]);
-    flag &= (c[1][i]-c[2][i] == c[1][i+1]-c[2][i+1]);
-  }
-  cout<<(flag?"Yes":"No") << endl;
 }

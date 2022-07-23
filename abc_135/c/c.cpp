@@ -17,76 +17,28 @@ long long T[200007];
 
 int main()
 {
-  int N;
+  ll N;
   cin >> N;
 
-  map<int, int> even_mp;
-  map<int, int> odd_mp;
-  int even_max = 0;
-  int even_max_count = 0;
-  int even_second_max = 0;
-  int even_second_max_count = 0;
-  int odd_max = 0;
-  int odd_max_count = 0;
-  int odd_second_max = 0;
-  int odd_second_max_count = 0;
-  int v[N+1];
-  for (int i = 1; i <= N; i++) {
-    int val;
-    cin >> val;
-    v[i] = val;
-    if (i % 2 == 0) {
-      even_mp[val]++;
-    } else {
-      odd_mp[val]++;
-    }
+  ll A[N+1];
+  ll B[N];
+  rep(i, N+1) {
+    cin >> A[i];
   }
-
-  // コーナーケースのチェック
-  bool is_same = true;
-  for (int i = 1; i < N; i++) {
-    if (v[i] != v[i+1]) {
-      is_same = false;
-    }
+  rep(i, N) {
+    cin >> B[i];
   }
-  if (is_same) {
-    cout << N / 2 << endl;
-    return 0;
-  }
-
-  for (auto x : even_mp) {
-    if (x.second > even_second_max_count) {
-      if (x.second > even_max_count) {
-        even_second_max = even_max;
-        even_second_max_count = even_max_count;
-        even_max = x.first;
-        even_max_count = x.second;
-      } else {
-        even_second_max = x.first;
-        even_second_max_count = x.second;
-      }
-    }
-  }
-  for (auto x : odd_mp) {
-    if (x.second > odd_second_max_count) {
-      if (x.second > odd_max_count) {
-        odd_second_max = odd_max;
-        odd_second_max_count = odd_max_count;
-        odd_max = x.first;
-        odd_max_count = x.second;
-      } else {
-        odd_second_max = x.first;
-        odd_second_max_count = x.second;
-      }
-    }
-  }
-  int ans;
-  if (even_max == odd_max) {
-    int ans1 = N - odd_max_count - even_second_max_count;
-    int ans2 = N - even_max_count - odd_second_max_count;
-    ans = min(ans1, ans2);
-  } else {
-    ans = N - odd_max_count - even_max_count;
+  ll ans = 0;
+  rep(i, N) {
+    // i, i+1番目を見るがiから埋めていく
+    ll i_help = min(A[i], B[i]);
+    A[i] -= i_help;
+    B[i] -= i_help;
+    ans += i_help;
+    ll i1_help = min(A[i+1], B[i]);
+    A[i+1] -= i1_help;
+    B[i] -= i1_help;
+    ans += i1_help;
   }
   cout << ans << endl;
 }

@@ -13,12 +13,35 @@ using P = pair<int, int>;
 int main()
 {
 
-  string S[3], T;
-  cin >> S[0] >> S[1] >> S[2] >> T;
-  string ans = "";
-  for (int i = 0; i < T.size(); ++i) {
-    int index = T[i] - '0' - 1;
-    ans += S[index];
+  int N, M;
+  cin >> N >> M;
+  int x[M];
+  int y[M];
+  rep(i, M) {
+    cin >> x[i] >> y[i];
+  }
+
+  vector<bool> is_red(N+1, false);
+  vector<int> balls(N+1, 1);
+  is_red[1] = true;
+  for(int i = 0; i < M; i++) {
+    int tmp_x = x[i];
+    int tmp_y = y[i];
+
+    // 箱のボールが1つで赤いボールが入っている可能性がある時
+    if (balls[tmp_x] == 1 && is_red[tmp_x]) {
+      is_red[tmp_x] = false;
+      is_red[tmp_y] = true;
+    }
+    if (balls[tmp_x] > 1 && is_red[tmp_x]) {
+      is_red[tmp_y] = true;
+    }
+    balls[tmp_x]--;
+    balls[tmp_y]++;
+  }
+  int ans = 0;
+  for(int i = 1; i <= N; i++) {
+    if (is_red[i]) ans++;
   }
   cout << ans << endl;
 }

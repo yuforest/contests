@@ -15,30 +15,22 @@ vector<int> G[1 << 18];
 long long K[200007];
 long long T[200007];
 
-void dfs(int pos) {
-  minimum_time += T[pos];
-	used[pos] = true;
-
-	for (int i : G[pos]) {
-		if (used[i] == false) dfs(i);
-	}
-}
 
 int main()
 {
-  vector<vector<int>> c(3, vector<int>(3));
-  rep (i, 3) {
-    rep (j, 3) {
-      cin >> c[i][j];
-    }
+  vector<int> nums(3);
+  rep(i, 3) {
+    cin >> nums[i];
   }
-  bool flag = true;
-
-  for(int i = 0;i<=1;i++) {
-    flag &= (c[i][0] - c[i][1] == c[i+1][0] - c[i+1][1]);
-    flag &= (c[i][1]-c[i][2] == c[i+1][1]-c[i+1][2]);
-    flag &= (c[0][i]-c[1][i] == c[0][i+1]-c[1][i+1]);
-    flag &= (c[1][i]-c[2][i] == c[1][i+1]-c[2][i+1]);
+  sort(nums.begin(), nums.end(), greater<int>());
+  int diff1 = nums[0] - nums[1];
+  int diff2 = nums[0] - nums[2];
+  int diff3 = abs(diff1 - diff2);
+  int ans = 0;
+  ans += min(diff1, diff2);
+  ans += diff3 / 2;
+  if (diff3 % 2 == 1) {
+    ans += 2;
   }
-  cout<<(flag?"Yes":"No") << endl;
+  cout << ans << endl;
 }

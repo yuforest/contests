@@ -15,78 +15,21 @@ vector<int> G[1 << 18];
 long long K[200007];
 long long T[200007];
 
+// greatest common divisor(最大公約数)
+ll gcd(ll a, ll b) { return a ? gcd(b % a, a) : b; }
+// least common multiple
+ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
+
 int main()
 {
   int N;
   cin >> N;
-
-  map<int, int> even_mp;
-  map<int, int> odd_mp;
-  int even_max = 0;
-  int even_max_count = 0;
-  int even_second_max = 0;
-  int even_second_max_count = 0;
-  int odd_max = 0;
-  int odd_max_count = 0;
-  int odd_second_max = 0;
-  int odd_second_max_count = 0;
-  int v[N+1];
-  for (int i = 1; i <= N; i++) {
-    int val;
-    cin >> val;
-    v[i] = val;
-    if (i % 2 == 0) {
-      even_mp[val]++;
-    } else {
-      odd_mp[val]++;
-    }
+  int A[N];
+  rep(i, N) {
+    cin >> A[i];
   }
-
-  // コーナーケースのチェック
-  bool is_same = true;
-  for (int i = 1; i < N; i++) {
-    if (v[i] != v[i+1]) {
-      is_same = false;
-    }
-  }
-  if (is_same) {
-    cout << N / 2 << endl;
-    return 0;
-  }
-
-  for (auto x : even_mp) {
-    if (x.second > even_second_max_count) {
-      if (x.second > even_max_count) {
-        even_second_max = even_max;
-        even_second_max_count = even_max_count;
-        even_max = x.first;
-        even_max_count = x.second;
-      } else {
-        even_second_max = x.first;
-        even_second_max_count = x.second;
-      }
-    }
-  }
-  for (auto x : odd_mp) {
-    if (x.second > odd_second_max_count) {
-      if (x.second > odd_max_count) {
-        odd_second_max = odd_max;
-        odd_second_max_count = odd_max_count;
-        odd_max = x.first;
-        odd_max_count = x.second;
-      } else {
-        odd_second_max = x.first;
-        odd_second_max_count = x.second;
-      }
-    }
-  }
-  int ans;
-  if (even_max == odd_max) {
-    int ans1 = N - odd_max_count - even_second_max_count;
-    int ans2 = N - even_max_count - odd_second_max_count;
-    ans = min(ans1, ans2);
-  } else {
-    ans = N - odd_max_count - even_max_count;
-  }
+  int ans = 0;
+  rep(i, N) ans = gcd(ans, A[i]);
   cout << ans << endl;
+
 }

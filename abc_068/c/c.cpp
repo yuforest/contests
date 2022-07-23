@@ -15,30 +15,54 @@ vector<int> G[1 << 18];
 long long K[200007];
 long long T[200007];
 
-void dfs(int pos) {
-  minimum_time += T[pos];
-	used[pos] = true;
+// 別解(0->iとi->Nの辺があるかを1~N-1に対して探す)
+// int N, M;
+// set<pair<int, int>> E;
+// //---------------------------------------------------------------------------------------------------
+// string solve() {
+//     rep(i, 1, N - 1) {
+//         if (E.count({ 0,i }) && E.count({ i, N - 1 })) return "POSSIBLE";
+//     }
+//     return "IMPOSSIBLE";
+// }
+// //---------------------------------------------------------------------------------------------------
+// void _main() {
+//     cin >> N >> M;
+//     rep(i, 0, M) {
+//         int a, b; cin >> a >> b;
+//         a--; b--;
+//         E.insert({ a,b });
+//         E.insert({ b,a });
+//     }
 
+//     cout << solve() << endl;
+// }
+
+
+void dfs(int pos, int transfer_count) {
+	used[pos] = true;
+  if (transfer_count == 2) return;
 	for (int i : G[pos]) {
-		if (used[i] == false) dfs(i);
+		dfs(i, transfer_count+1);
 	}
 }
 
+
+
 int main()
 {
-  vector<vector<int>> c(3, vector<int>(3));
-  rep (i, 3) {
-    rep (j, 3) {
-      cin >> c[i][j];
-    }
+  int N, M;
+  cin >> N >> M;
+  int a[N], b[N];
+  rep(i, M) {
+    cin >> a[i] >> b[i];
+    G[a[i]].push_back(b[i]);
+    G[b[i]].push_back(a[i]);
   }
-  bool flag = true;
-
-  for(int i = 0;i<=1;i++) {
-    flag &= (c[i][0] - c[i][1] == c[i+1][0] - c[i+1][1]);
-    flag &= (c[i][1]-c[i][2] == c[i+1][1]-c[i+1][2]);
-    flag &= (c[0][i]-c[1][i] == c[0][i+1]-c[1][i+1]);
-    flag &= (c[1][i]-c[2][i] == c[1][i+1]-c[2][i+1]);
+  dfs(1, 0);
+  if (used[N]) {
+    cout << "POSSIBLE" << endl;
+  } else {
+    cout << "IMPOSSIBLE" << endl;
   }
-  cout<<(flag?"Yes":"No") << endl;
 }

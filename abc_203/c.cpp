@@ -8,19 +8,32 @@ long long int N, M, K, T, H, W, L, R;
 
 int main()
 {
+  ll N, K;
   cin >> N >> K;
-  vector<pair<long long int, long long int>> vp(N);
-  for (auto &i : vp)
-    cin >> i.first >> i.second;
-  sort(vp.begin(), vp.end());
-  for (auto i : vp)
-  {
-    if (K >= i.first)
-    {
-      K += i.second;
+  vector<ll> A(N), B(N);
+  vector<pair<ll, ll>> villages;
+  rep(i, N) {
+    cin >> A[i] >> B[i];
+    pair<ll, ll> tmp = {A[i], B[i]};
+    villages.push_back(tmp);
+  }
+  sort(villages.begin(), villages.end());
+  // rep(i, N) {
+  //   cout << villages[i].first << endl;
+  //   cout << villages[i].second << endl;
+  // }
+  ll ans = K;
+  ll index = 0;
+  while(index < N) {
+    ll next_village = villages[index].first;
+    if (ans >= next_village) {
+      ans += villages[index].second;
+      index++;
+    } else {
+      break;
     }
   }
-  cout << K << endl;
+  cout << ans << endl;
 }
 
 

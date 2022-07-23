@@ -26,39 +26,32 @@ int L[100007];
 vector<vector<ll>> a(100007, vector<ll>());
 ll ans = 0;
 
-void check(int currentIndex, ll currentAns) {
-    if (currentIndex == N) {
-    //   cout << currentAns << endl;
-      if (X == currentAns) {
-        ans++;
-      }
-      return;
-    }
-    if (X < currentAns) {
-      return;
-    }
-
-    for (int i = 0; i < L[currentIndex]; i++) {
-        ll tmpVal = currentAns * a[currentIndex][i];
-        if (X < tmpVal) {
-            continue;
-        }
-        check(currentIndex+1, tmpVal);
-    }
-}
-
 int main() {
-  cin >> N >> X;
-  rep (i, N) {
-    cin >> L[i];
-    rep (j, L[i]) {
-      ll val;
-      cin >> val;
-      a[i].push_back(val);
-    }
+  ll N, M;
+  cin >> N >> M;
+  ll A[N];
+  ll B[N];
+  rep(i, N) {
+    cin >> A[i] >> B[i];
   }
-  check(0, 1);
-
+  vector<int> S;
+  for (int i = 0; i < N; i++) {
+    S.push_back(i);
+  }
+  sort(S.begin(), S.end(), [&](int left, int right){
+    return A[left] < A[right];
+  });
+  // sort(ans.begin(), ans.end(), [&](int a, int b) {
+	// 	if (S[a] != S[b]) return S[a] < S[b];
+	// 	return P[a] > P[b];
+	// });
+  ll ans = 0;
+  for(auto i: S) {
+    if (M == 0) break;
+    ll purchase_count = min(M, B[i]);
+    M -= purchase_count;
+    ans += purchase_count * A[i];
+  }
   cout << ans << endl;
   return 0;
 }

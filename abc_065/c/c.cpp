@@ -9,24 +9,28 @@ int n, k;
 int c[300005];
 map<int, int> mp;
 long long mod = 1000000007;
+using ll = long long;
+
+long long permutation(ll N) {
+  ll ans = 1;
+  for (ll i = 1; i<= N; i++) {
+    ans *= i;
+    ans %= mod;
+  }
+  return ans;
+}
 
 int main(void)
 {
-  int N;
-  cin >> N;
-  int A[N];
-  for (int i = 0; i < N; i++) {
-    cin >> A[i];
+  ll N, M;
+  cin >> N >> M;
+
+  if (N == M) {
+    cout << ((permutation(N) * permutation(M)) % mod) * 2 % mod << endl;
+  } else if (abs(N-M) == 1) {
+    cout << (permutation(N) * permutation(M)) % mod << endl;
+  } else {
+    cout << 0 << endl;
   }
 
-  vector<int> ans;
-  for (int i = 0; i < N; i++) {
-    auto result = find(ans.begin(), ans.end(), A[i]);
-    if (result == ans.end()) {
-      ans.push_back(A[i]);
-    } else {
-      ans.erase(result);
-    }
-  }
-  cout << ans.size() << endl;
 }

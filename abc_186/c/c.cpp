@@ -9,40 +9,25 @@ int n, k;
 int c[300005];
 map<int, int> mp;
 long long mod = 1000000007;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
 int main(void)
 {
-  string X;
   int N;
-  cin >> X;
   cin >> N;
-  vector<string> S(N);
-  for (int i = 0; i < N; i++) {
-    cin >> S[i];
-  }
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < S[i].size(); j++) {
-      for (int k = 0; k < X.size(); k++) {
-        if (S[i][j] == X[k]) {
-          S[i][j] = k + '0';
-        }
-      }
+  int ans = 0;
+  rep(i, N) {
+    int num = i+1;
+    bool not_7 = true;
+    stringstream ss;
+    ss << oct << num;
+    for(auto c: ss.str()) {
+      if (c == '7') not_7 = false;
     }
-  }
-  sort(S.begin(), S.end());
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < S[i].size(); j++) {
-      for (int k = 0; k < X.size(); k++) {
-        if (S[i][j] == k + '0') {
-          S[i][j] = X[k];
-        }
-      }
+    for(auto c: to_string(num)) {
+      if (c == '7') not_7 = false;
     }
+    if (not_7) ans++;
   }
-  for (int i = 0; i < N; i++) {
-    cout << S[i] << endl;
-  }
-
-
-
+  cout << ans << endl;
 }

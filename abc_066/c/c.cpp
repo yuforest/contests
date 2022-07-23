@@ -15,30 +15,34 @@ vector<int> G[1 << 18];
 long long K[200007];
 long long T[200007];
 
-void dfs(int pos) {
-  minimum_time += T[pos];
-	used[pos] = true;
-
-	for (int i : G[pos]) {
-		if (used[i] == false) dfs(i);
-	}
-}
-
 int main()
 {
-  vector<vector<int>> c(3, vector<int>(3));
-  rep (i, 3) {
-    rep (j, 3) {
-      cin >> c[i][j];
+  int N;
+  cin >> N;
+  int A[N];
+  rep(i, N) {
+    cin >> A[i];
+  }
+  deque<int> deq;
+  bool reversed = false;
+  rep(i, N) {
+    if (i % 2 == 0) {
+      deq.push_back(A[i]);
+    } else {
+      deq.push_front(A[i]);
+    }
+    reversed = !reversed;
+  }
+  if (reversed) {
+    reverse(deq.begin(), deq.end());
+  }
+  rep (i, N) {
+    if (i != N-1) {
+      cout << deq[i] << " ";
+
+    } else {
+      cout << deq[i] << endl;
     }
   }
-  bool flag = true;
-
-  for(int i = 0;i<=1;i++) {
-    flag &= (c[i][0] - c[i][1] == c[i+1][0] - c[i+1][1]);
-    flag &= (c[i][1]-c[i][2] == c[i+1][1]-c[i+1][2]);
-    flag &= (c[0][i]-c[1][i] == c[0][i+1]-c[1][i+1]);
-    flag &= (c[1][i]-c[2][i] == c[1][i+1]-c[2][i+1]);
-  }
-  cout<<(flag?"Yes":"No") << endl;
+  return 0;
 }
