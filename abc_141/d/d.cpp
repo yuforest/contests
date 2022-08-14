@@ -22,15 +22,15 @@ int main(void)
   cin >> N >> M;
   vector<ll> A(N);
   priority_queue<
-    long long,                // 要素の型はint
+    long long,                // 要素の型はlong long
     std::vector<long long>,   // 内部コンテナはstd::vector (デフォルトのまま)
-    std::less<long long>   // 昇順 (デフォルトはstd::less<T>)
+    std::less<long long>   // 降順 (デフォルトはstd::less<T>、降順)
   > que;
   rep(i, N) {
     cin >> A[i];
     que.push(A[i]);
   }
-
+  // queの中にある一番高い商品に対して割引を行う
   while(M > 0) {
     ll val = que.top() / 2;
     que.pop();

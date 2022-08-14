@@ -9,35 +9,23 @@ int n, k;
 int c[300005];
 map<int, int> mp;
 long long mod = 1000000007;
+using ll = long long;
 
 int main(void)
 {
-  int N, M;
-  cin >> N >> M;
-  vector<deque<int>> deqs(M, deque<int>);
-  for (int i = 0; i < M; i++) {
-    int k;
-    cin >> k;
-    for (int j = 0; j < k; j++) {
-      int ball;
-      cin >> ball;
-      deqs[i].push_back(ball);
+  int S;
+  cin >> S;
+  vector<ll> dp(2007, 0);
+  dp[3] = 1;
+  dp[4] = 1;
+  dp[5] = 1;
+  for(int i = 6; i <= 2000; i++) {
+    for(int j = 3; j <= i-3; j++) {
+      dp[i] += dp[j];
+      dp[i] %= mod;
     }
+    dp[i]++;
+    dp[i] %= mod;
   }
-  string ans = "No";
-  while (true) {
-    bool empty = true;
-    vector<int> 
-    for (int i = 0; i < M; i++) {
-      deque<int> current_deq = deqs[i];
-      if (!current_deq.empty()) {
-        empty = false;
-      }
-    }
-    if (empty) {
-      ans = "Yes";
-      break;
-    }
-  }
-  cout << ans << endl;
+  cout << dp[S] << endl;
 }

@@ -26,19 +26,20 @@ void dfs(int pos) {
 
 int main()
 {
-  int N;
-  cin >> N;
-  for (int i = 0; i < N; ++i) {
-    cin >> T[i];
-    long long k;
-    cin >> k;
-    K[i] = k;
-    for (int j = 0; j < K[i]; ++j) {
-      int a;
-      cin >> a;
-      G[i].push_back(a-1);
+  ll K;
+  cin >> K;
+
+  ll remaining = 0;
+  for(int i = 0; i < K; i++) {
+    remaining = remaining * 10 + 7;
+
+    if (remaining % K == 0) {
+      cout << i+1 << endl;
+      return 0;
     }
+
+    remaining %= K;
   }
-  dfs(N-1);
-  cout << minimum_time << endl;
+  cout << -1 << endl;
+
 }

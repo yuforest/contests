@@ -5,7 +5,8 @@
       "includePath": [
         "${workspaceFolder}/**",
         "/opt/homebrew/include/**",
-        "/Users/yuforest/dev/ac-library"
+        "/Users/yuforest/dev/ac-library",
+        "/Users/yuforest/dev/c++/debug"
       ],
       "defines": [],
       "macFrameworkPath": [
@@ -13,7 +14,7 @@
       ],
       "compilerPath": "/usr/local/bin/g++",
       "cStandard": "c17",
-      "cppStandard": "c++14",
+      "cppStandard": "c++17",
       "intelliSenseMode": "macos-gcc-arm64"
     }
   ],

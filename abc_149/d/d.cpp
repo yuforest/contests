@@ -10,30 +10,53 @@ int c[300005];
 map<int, int> mp;
 #define rep(i, n) for (int i = 0; i < (n); ++i)
 long long mod = 1000000007;
+using ll = long long;
 
 int main() {
-  long long N, M;
-  cin >> N >> M;
-  vector<long long> A(M);
-  for (int i = 0; i < M; ++i) cin >> A[i];
-  sort(A.begin(), A.end());
-
-  // 番兵追加
-  A.insert(A.begin(), 0);
-  A.push_back(N+1);
-
-  // 白塊に分解 (同時に最小値も求める)
-  vector<long long> v;
-  long long K = N;
-  for (int i = 0; i+1 < A.size(); ++i) {
-      long long len = A[i+1] - A[i] - 1;
-      if (len > 0) {
-          v.push_back(len);
-          K = min(K, len);
+  ll N, K, R, S, P;
+  cin >> N >> K >> R >> S >> P;
+  string T;
+  cin >> T;
+  // K回目までは必ず勝つ手、それ以降は勝つ手がK回前と同じなら勝てない
+  ll ans = 0;
+  bool results[N];
+  rep(i, N){
+    if (i < K) {
+      if (T[i] == 'r') {
+        ans += P;
+      } else if (T[i] == 's') {
+        ans += R;
+      } else {
+        ans += S;
       }
+      results[i] = true;
+    } else {
+      if (T[i] == T[i-K]) {
+        if (results[i-K]) {
+          results[i] = false;
+        } else {
+          if (T[i] == 'r') {
+            ans += P;
+          } else if (T[i] == 's') {
+            ans += R;
+          } else {
+            ans += S;
+          }
+          results[i] = true;
+        }
+      } else {
+        if (T[i] == 'r') {
+          ans += P;
+        } else if (T[i] == 's') {
+          ans += R;
+        } else {
+          ans += S;
+        }
+        results[i] = true;
+      }
+    }
   }
+  cout << ans << endl;
 
-  long long res = 0;
-  for (auto len : v) res += (len + K - 1) / K;
-  cout << res << endl;
+
 }

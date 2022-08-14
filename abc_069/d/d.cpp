@@ -11,46 +11,59 @@ map<int, int> mp;
 // long long mod = 1000000007;
 // 縦軸が弁当の種類、横軸がたこ焼きの数、配列の値が鯛焼きの数
 int dp[301][301][301];
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
 int main(void)
 {
-  int N;
-  int mod = 998244353;
-  cin >> N;
-  int A[N];
-  int B[N];
-  for (int i = 0; i < N; i++) {
-    cin >> A[i];
+  int H, W, N;
+  cin >> H >> W >> N;
+  int A[N+1];
+  rep(i, N) {
+    cin >> A[i+1];
   }
-  for (int i = 0; i < N; i++) {
-    cin >> B[i];
-  }
-  long long dp[3001][3001];
-  for (int i = 0; i < 3001; i++) {
-    for (int j = 0; j < 3001; j++) {
-      dp[i][j] = 0;
+  vector<vector<int>> grid(H, vector<int>(W, 0));
+  int current_w = 0;
+  int current_h = 0;
+  int current = 1;
+  while(true) {
+    // cout << current_h << endl;
+    // cout << current_w << endl;
+    // cout << endl;
+    // 現在の数字を入れていく
+    grid[current_h][current_w] = current;
+    A[current]--;
+    if (A[current] == 0) current++;
+
+    // Hの高さの偶奇によって終了条件が異なる
+    if (H % 2 == 0) {
+      if (current_h == H-1 && current_w == 0) break;
+    } else {
+      if (current_h == H-1 && current_w == W-1) break;
     }
-  }
-  for (int i = 0; i < N; i++) {
-    if (i == 0) {
-      for (int j = A[i]; j <= B[i]; j++) {
-        dp[i][j] = 1;
+
+    // 偶数行の時右に動く
+    if (current_h % 2 == 0) {
+      // 端まで来たら下に移動
+      if (current_w == W-1) {
+        current_h++;
+      } else {
+        current_w++;
       }
     } else {
-      int current_a = A[i];
-      int current_b = B[i];
-      for (int j = 0; j < 3001; j++) {
-        if (dp[i-1][j] == 0) continue;
-        if(dp[i-1][j] >= current_a && dp[i-1][j] <= current_b) {
-          dp[i][j] += 1;
-        }
+      // 奇数行の時左に動く
+      // 端まで来たら下に移動
+      if (current_w == 0) {
+        current_h++;
+      } else {
+        current_w--;
       }
     }
   }
-  long long ans = 0;
-  for (int i = 0; i <= 3000; i++) {
-    ans += dp[N][i];
+  for(int i = 0; i < H; i++) {
+    for (int j = 0; j < W; j++) {
+      cout << grid[i][j];
+      if (j != W-1) cout << " ";
+    }
+    cout << endl;
   }
-  cout << ans % mod << endl;
-  cout << "hello" << endl;
 }

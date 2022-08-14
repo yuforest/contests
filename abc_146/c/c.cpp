@@ -22,6 +22,7 @@ ll check(ll x) {
 int main() {
   cin >> A >> B >> X;
   ll ok = 0, ng = 1000000001;
+  // 二分探索(okとngの差が1になるまで)
   while (ok + 1 != ng) {
     ll md = (ok + ng) / 2;
     if (check(md) <= X) ok = md;

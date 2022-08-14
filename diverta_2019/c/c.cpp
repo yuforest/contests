@@ -9,40 +9,42 @@ int n, k;
 int c[300005];
 map<int, int> mp;
 long long mod = 1000000007;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
 
 int main(void)
 {
-  string X;
   int N;
-  cin >> X;
   cin >> N;
-  vector<string> S(N);
-  for (int i = 0; i < N; i++) {
+  string S[N];
+  rep(i, N) {
     cin >> S[i];
   }
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < S[i].size(); j++) {
-      for (int k = 0; k < X.size(); k++) {
-        if (S[i][j] == X[k]) {
-          S[i][j] = k + '0';
+  int full = 0;
+  int first_B = 0;
+  int last_A = 0;
+  int both = 0;
+  rep(i, N) {
+    string current = S[i];
+    if (current[0] == 'B' && current[current.size()-1] == 'A') both++;
+    else if (current[0] == 'B') first_B++;
+    else if (current[current.size()-1] == 'A') last_A++;
+    for(int j = 0; j < current.size(); j++) {
+      if (j != current.size()-1) {
+        if (current[j] == 'A' && current[j+1] == 'B') {
+          full++;
         }
       }
     }
   }
-  sort(S.begin(), S.end());
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < S[i].size(); j++) {
-      for (int k = 0; k < X.size(); k++) {
-        if (S[i][j] == k + '0') {
-          S[i][j] = X[k];
-        }
-      }
-    }
+  // cout << full << endl;
+  // cout << first_B << endl;
+  // cout << last_A << endl;
+  // cout << both << endl;
+  int ans = full;
+  if (first_B + last_A == 0) {
+    ans += max(0, both-1);
+  } else {
+    ans += both + min(first_B, last_A);
   }
-  for (int i = 0; i < N; i++) {
-    cout << S[i] << endl;
-  }
-
-
-
+  cout << ans << endl;
 }

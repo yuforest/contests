@@ -12,13 +12,25 @@ long long mod = 1000000007;
 
 int main(void)
 {
-  int S;
-  cin >> S;
-  while {
-    if (S.size() == 4) {
-      break;
+  long long N;
+  cin >> N;
+
+  vector<long long> count(N + 1, 0);
+  for (long long i = 2LL; i <= N; ++i) {
+    long long k = i;
+    for (long long j = 2LL; j <= i; ++j) {
+      while (k % j == 0) {
+        ++count.at(j);
+        k /= j;
+      }
     }
-    S = "0" + S;
   }
-  cout << S << endl;
+
+  long long answer = 1;
+  for (long long i = 2LL; i <= N; ++i) {
+    answer *= (count.at(i) + 1);
+    answer %= mod;
+  }
+
+  cout << answer << endl;
 }
