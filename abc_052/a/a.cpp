@@ -11,15 +11,7 @@ using P = pair<int, int>;
 
 int main()
 {
-  int X;
-  cin >> X;
-  if (X < 40) {
-    cout << 40 - X << endl;
-  } else if (X < 70) {
-    cout << 70 - X << endl;
-  } else if (X < 90) {
-    cout << 90 - X << endl;
-  } else {
-    cout << "expert" << endl;
-  }
+  int A, B, C, D;
+  cin >> A >> B >> C >> D;
+  cout << max(A * B, C * D) << endl;
 }

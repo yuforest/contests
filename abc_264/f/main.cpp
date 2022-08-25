@@ -37,6 +37,7 @@ vector<ll> G[1 << 18];
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
+#define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
 // 無くても困らない

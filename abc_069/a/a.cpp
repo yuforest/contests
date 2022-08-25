@@ -12,7 +12,7 @@ long long mod = 1000000007;
 
 int main(void)
 {
-  double X;
-  cin >> X;
-  cout << round(X) << endl;
+  int n, m;
+  cin >> n >> m;
+  cout << (n-1) *  (m-1) << endl;
 }

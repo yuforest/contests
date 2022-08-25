@@ -12,28 +12,31 @@ using P = pair<int, int>;
 
 int main()
 {
-  int N;
-  cin >> N;
-  string S[N];
-  string T[N];
-  map<string, int> mp;
-
-  for (int i = 0; i < N; i++) {
-    cin >> S[i];
-    cin >> T[i];
-    string name = S[i] + " " + T[i];
-    auto itr = mp.find(name);
-    if( itr != mp.end() ) {
-      mp[name]++;
-    } else {
-      mp[name] = 1;
-    }
+  int H, W, X, Y;
+  cin >> H >> W >> X >> Y;
+  X--;Y--;
+  string S[H];
+  rep(i, H) cin >> S[i];
+  int ans = 1;
+  // 上に見ていく
+  for(int i = X-1; i >= 0; i--) {
+    if (S[i][Y] == '#') break;
+    else ans++;
   }
-  string ans = "No";
-  for (auto x : mp) {
-    if (x.second >= 2) {
-      ans = "Yes";
-    }
+  // 下に見ていく
+  for(int i = X+1; i < H; i++) {
+    if (S[i][Y] == '#') break;
+    else ans++;
+  }
+  // 左に見ていく
+  for(int i = Y-1; i >= 0; i--) {
+    if (S[X][i] == '#') break;
+    else ans++;
+  }
+  // 左に見ていく
+  for(int i = Y+1; i < W; i++) {
+    if (S[X][i] == '#') break;
+    else ans++;
   }
   cout << ans << endl;
 }
