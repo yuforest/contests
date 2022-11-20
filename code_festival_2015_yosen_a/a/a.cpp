@@ -10,5 +10,8 @@ using ll = long long;
 using P = pair<int, int>;
 
 int main() {
-	cout << 654231 << endl;
+	string S;
+	cin >> S;
+	S[S.size()-1] = '5';
+	cout << S << endl;
 }

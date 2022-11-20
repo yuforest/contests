@@ -13,12 +13,13 @@ using P = pair<int, int>;
 int main()
 {
 
-  string S[3], T;
-  cin >> S[0] >> S[1] >> S[2] >> T;
-  string ans = "";
-  for (int i = 0; i < T.size(); ++i) {
-    int index = T[i] - '0' - 1;
-    ans += S[index];
+  int N;
+  cin >> N;
+  int l[N], r[N];
+  ll ans = 0;
+  rep(i, N) {
+    cin >> l[i] >> r[i];
+    ans += r[i]  - l[i] + 1;
   }
   cout << ans << endl;
 }

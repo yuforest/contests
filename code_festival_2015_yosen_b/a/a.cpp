@@ -12,13 +12,5 @@ using P = pair<int, int>;
 int main() {
 	string S;
   cin >> S;
-  long long  black = 0;
-  long long  ans = 0;
-  for (int i = 0; i < S.size(); ++i) {
-    if (S[i] == 'B') black++;
-    if (S[i] == 'W') {
-      ans += black;
-    }
-  }
-  cout << ans << endl;
+  cout << S + S << endl;
 }

@@ -57,66 +57,47 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
+// leftとrightの間に空席が存在するかどうかを判定する関数
+bool betemp(string sleft, string sright, int left, int right) {
+  // もし2つの文字が等しければ、間隔が奇数がどうかを返す
+  if (sleft == sright) return (right - left) % 2 == 1;
+  // もし異なれば、間隔が偶数かどうかを返す
+  else return (right - left) % 2 == 0;
+}
+
+// 間隔が偶数で、両端の性別が異なる
+// 間隔が奇数で、両端の性別が等しい
+// という場合には必ずその間に空席が存在する
+void solve(int N) {
+  string vac = "Vacant";
+  string sleft, sright, str;
+  int left = 0, right = N/2;
+  // 最初と半分の箇所にクエリを送る(0,1,2,3,4であれば0と2)
+  cout << left << endl;
+  cin >> sleft;
+  if (sleft == vac) return;
+  cout << right << endl;
+  cin >> sright;
+  if (sright == vac) return;
+
+  // 空席が存在しない場合は、文字を交換し、rightからNで二分探索を行う
+  // 前半分にあるか、後ろ半分にあるかを確かめている
+  if (!betemp(sleft, sright, left, right)) {
+    swap(sleft, sright), left = right, right = N;
+  }
+  // leftとrightの間隔が空いている限りループ
+  while (right - left > 1) {
+    int mid = (left + right) / 2;
+    cout << mid << endl;
+    cin >> str;
+    if (str == vac) return;
+    // 探索区間に空席があればrightを更新し、なければleftを更新する
+    if (betemp(sleft, str, left, mid)) sright = str, right = mid;
+    else sleft = str, left = mid;
+  }
+}
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
-    }
-  }
-  cout << ans << endl;
-  return 0;
+  int N;
+  while (cin >> N) solve(N);
 }

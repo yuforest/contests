@@ -14,31 +14,17 @@ using P = pair<int, int>;
 
 int main()
 {
-  int H, W;
-  cin >> H >> W;
-  string S[H];
-  for (int i = 0; i < H; i++) {
-    cin >> S[i];
-  }
-  for (int i = 0; i < H; i++) {
-    for (int j = 0; j < W; j++) {
-      char current = S[i][j];
-      if (current == '.') {
-        int count = 0;
-        for (int k = -1; k <= 1; k++) {
-          for (int l = -1; l <= 1; l++) {
-            if (k == 0 && l == 0) continue;
-            if (i + k >= 0 && i + k < H && j + l >= 0 && j + l < W ) {
-              if (S[i + k][j + l] == '#') count++;
-            }
-          }
-        }
-        char charCount = '0' + count;
-        S[i][j] = charCount;
-      }
+  ll N, K;
+  cin >> N >> K;
+  ll ans = 1;
+  rep(i, N) {
+    ll o_a = ans * 2;
+    ll o_b = ans + K;
+    if (o_a <= o_b) {
+      ans = o_a;
+    } else {
+      ans = o_b;
     }
   }
-  for (int i = 0; i < H; i++) {
-    cout << S[i] << endl;
-  }
+  cout << ans << endl;
 }

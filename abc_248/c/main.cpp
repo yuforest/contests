@@ -28,11 +28,12 @@ using pii = pair<int, int>;
 
 map<int, int> mp;
 long long mod = 1000000007;
+long long mod2 = 998244353;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-// #include <atcoder/all>
-// using namespace atcoder;
+#include <atcoder/all>
+using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -58,65 +59,33 @@ inline bool chmin(T &a, T b) {
 }
 
 int ans[2010];
-int N, M;
+using mint = modint998244353;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
+  int n, m, K;
+  cin >> n >> m >> K;
+  // dp[i][j]:=数列の先頭からi項まで決めた際に、総和がjであるような数列の決め方の総数
+  vector dp(n + 1, vector(K + 1, mint(0)));
+  dp[0][0] = 1;
 
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
+  for(int i = 0; i < n; i++) {
+    for(int j = 0; j < K; j++) {
+      // 各項の上限はm
+      for(int k = 1; k <= m; k++) {
+        // ここまでの和と足そうとしている項の和がK以下なら遷移できる
+        if(j + k <= K) {
+          // 渡すDP
+          dp[i + 1][j + k] += dp[i][j];
         }
-        debug("---");
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
     }
   }
-  cout << ans << endl;
+  mint res = 0;
+  for(int i = 1; i <= K; i++) {
+    res += dp.back()[i];
+    debug(dp.back()[i].val());
+  }
+  cout << res.val() << endl;
+
   return 0;
 }

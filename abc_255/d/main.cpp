@@ -58,33 +58,53 @@ inline bool chmin(T &a, T b) {
 
 
 int main() {
-  ll N, L, R;
-  cin >> N >> L >> R;
-  ll A[N+1];
-  rep(i, N) {
-    cin >> A[i+1];
+  ll N, Q;
+  cin >> N >> Q;
+  vl A(N);
+  rep(i, N) cin >> A[i];
+  sort(A.begin(), A.end());
+  vl S(N+1, 0);
+  S[0] = 0;
+  rep(i, N) S[i+1] += S[i] + A[i];
+  debug(S);
+  rep(i, Q) {
+    ll x;
+    ll ans = 0;
+    cin >> x;
+    auto low = lower_bound(A.begin(), A.end(), x);
+    ll l_index = low - A.begin();
+    // 5 * 20 - 29 = 71
+    ans += (l_index) * x - S[l_index];
+    debug(l_index);
+    auto upper = upper_bound(A.begin(), A.end(), x);
+    ll u_index = upper - A.begin();
+    debug(u_index);
+    ans += S[N] - S[u_index] - (N - u_index) * x;
+    // 累積和
+    // 絶対値の差
+    // 順番は関係ない
+    cout << ans << endl;
   }
-  // dpxは右端からの変更、dpyは左端からの変更
-  ll dpx[N+1], dpy[N+1], ans;
-  dpx[0] = 0;
-  dpy[0] = 0;
-
-  // 累積和的に左端から現在の場所までの最小値を導く
-  for(ll i=1; i<=N; i++){
-    // ここまでを変えた時に全てをLにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpx[i] = min(dpx[i-1] + A[i], i*L);
-	}
-  // 累積和的に右端から現在の場所までの最小値を導く
-	for(ll i=1; i<=N; i++) {
-     // ここまでを変えた時に全てをRにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpy[i] = min(dpy[i-1] + A[N-i+1], i*R);
-	}
-  // yが最高でNにした時の最小値
-  ans = dpx[0]+dpy[N];
-	for(ll i=1; i<=N; i++) {
-		ans = min(ans, dpx[i] + dpy[N-i]);
-	}
-	cout << ans << endl;
-
   return 0;
 }
+// A: 2 5 5 6 11
+// S: [ 0 2 7 12 18 29 ]
+// l_index: 1
+// u_index: 3
+// 10
+// l_index: 5
+// u_index: 5
+// 71
+// l_index: 0
+// u_index: 0
+// 29
+
+// 5
+// 20
+// 0
+
+// 5 3
+// 6 11 2 5 5
+// 5
+// 20
+// 0

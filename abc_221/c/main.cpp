@@ -58,65 +58,65 @@ inline bool chmin(T &a, T b) {
 }
 
 int ans[2010];
-int N, M;
+ll N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
+  cin >> N;
+  vl digits;
+  while(N > 0) {
+    digits.push_back(N % 10);
+    N /= 10;
   }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
+  debug(digits);
+  ll N = digits.size();
+  ll ans = 0;
+  rep(msk, (1 << N)) {
+    debug(msk);
+    vl first;
+    vl second;
+    rep(i, N) {
+      if (msk & (1 << i)) {
+        first.push_back(digits[i]);
+      } else {
+        second.push_back(digits[i]);
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
     }
+    sort(first.begin(), first.end());
+    sort(second.begin(), second.end());
+    if (first.size() == 0) continue;
+    if (second.size() == 0) continue;
+    if (first.size() == 1 && first[0] == 0) continue;
+    if (second.size() == 1 && second[0] == 0) continue;
+    if (first.size() == 2 && first[0] == 0 && first[1] == 0) continue;
+    if (second.size() == 2 && second[0] == 0 && second[1] == 0) continue;
+    ll first_num = 0;
+    debug(first);
+    debug(second);
+    rep(i, first.size()) {
+      first_num += first[i] * pow(10, i);
+    }
+    ll second_num = 0;
+    rep(i, second.size()) {
+      second_num += second[i] * pow(10, i);
+    }
+    chmax(ans, first_num * second_num);
   }
   cout << ans << endl;
   return 0;
 }
+
+// これでも解ける
+// int main(){
+//   string N; cin >> N;
+//   sort(N.begin(),N.end());
+//   int ans = 0;
+//   do{
+//       for(int i=1; i<N.size(); i++){
+//           int l = 0, r = 0;
+//           for(int j=0; j<i; j++) l = l*10+N[j]-'0';
+//           for(int j=i; j<N.size(); j++) r = r*10+N[j]-'0';
+//           ans = max(ans,l*r);
+//       }
+//   }while(next_permutation(N.begin(),N.end()));
+//   cout << ans << endl;
+// }

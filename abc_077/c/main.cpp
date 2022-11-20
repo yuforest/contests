@@ -60,62 +60,32 @@ int ans[2010];
 int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
-    }
+  ll N;
+  cin >> N;
+  vl A(N), B(N), C(N);
+  rep(i, N) cin >> A[i];
+  rep(i, N) cin >> B[i];
+  rep(i, N) cin >> C[i];
+  sort(A.begin(), A.end());
+  sort(B.begin(), B.end());
+  sort(C.begin(), C.end());
+  ll ans = 0;
+  // 3つのものを考えるときは、真ん中を固定して考える
+  // 上部のパーツとして使えるのは大きさが[0,B[b])のもので、下部のパーツとして使えるのは大きさが(B[b],10^9]のものである。
+  // 上部のパーツとして使えるものの個数a = lower_bound(a.begin(), a.end(), b[j]) - a.begin();
+  // 下部のパーツとして使えるものの個数c = N - (upper_bound(c.begin(), c.end(), b[j]) - c.begin());
+  rep(j, N) {
+    // ai<bj  を満たす i の個数
+    long long Aj = lower_bound(A.begin(), A.end(), B[j]) - A.begin();
+    // ci ≤ bj  (不等号に等号が付くことに注意) を満たす i の個数を求めて、それを N から引けばよい
+    long long Cj = N - (upper_bound(C.begin(), C.end(), B[j]) - C.begin());
+    debug(Aj);
+    debug(Cj);
+    ans += Aj * Cj;
   }
   cout << ans << endl;
   return 0;
 }
+
+// upper_bound -> 探索したい値より大きい値が現れる最初の位置のイテレータ取得
+// lower_bound -> 探索したい値以上が現れる最初の位置のイテレータを取得

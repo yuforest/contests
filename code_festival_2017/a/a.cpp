@@ -10,12 +10,7 @@ using ll = long long;
 using P = pair<int, int>;
 
 int main() {
-  string S;
-  cin >> S;
-  std::regex re(R"(^A?KIHA?BA?RA?$)");
-  if (regex_match(S, re)) {
-    cout << "YES" << endl;
-  } else {
-    cout << "NO" << endl;
-  }
+  ll N;
+  cin >> N;
+  cout << 100 - (100 / N) << endl;
 }

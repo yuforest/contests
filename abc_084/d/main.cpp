@@ -57,72 +57,41 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int cumulative[100007];
+#define INF INT_MAX/2
+int K;
+//---------------------------------------------------------------------------------------------------
+int memo[45][100000];
+int vis[45][100000];
+int f(int rest, int mo) {
+  if (rest == 0 and mo == 0) return 1;
 
-bool is_prime(long long n) {  // is n prime or not
-  for (long long i = 2; i * i <= n; i++) {
-      if (n % i == 0) return false;
-  }
-  return true;
-}
+  if (0 < memo[rest][mo]) return memo[rest][mo];
+  if (vis[rest][mo]) return memo[rest][mo] = 2;
+  vis[rest][mo] = 1;
 
-// エラトステネスの篩を作成
-vector<int> makeBitPrimes(int n) {
-  // 全て素数のフラグを立てておく
-  vector<int> v(n + 1, 1);
-  v[0] = v[1] = 0;
-  rep3(i, 2, sqrt(n)) {
-    if (v[i]) {
-      // i * 2から操作を始めるための書き方
-      for (int j = 0; i * (j + 2) < n; j++) {
-        // 素数ではないのでフラグを下げる
-        v[i * (j + 2)] = 0;
-      }
+  int res = 2;
+  rep3(i, 0, 10) if (0 <= rest - i) {
+    if (f(rest - i, (mo * 10 + i) % K) == 1) {
+      res = 1;
+      break;
     }
   }
-  return v;
+
+  return memo[rest][mo] = res;
 }
+//---------------------------------------------------------------------------------------------------
+void _main() {
+  cin >> K;
 
-// エラトステネスの篩を使ってとける
-int Q;
-int A[101010], B[101010];
-int main() {
-  auto ps = makeBitPrimes(101010);
-  // 条件を満たすもののフラグを立てる
-  rep3(i, 1, 101010) if (ps[i] and ps[(i + 1) / 2]) A[i] = 1;
-  // 累積和に変換
-  rep3(i, 1, 101010) B[i] = B[i - 1] + A[i];
-
-  cin >> Q;
-  rep3(q, 0, Q) {
-    int L, R;
-    cin >> L >> R;
-
-    int ans = B[R] - B[L - 1];
-    printf("%d\n", ans);
+  int ma = 0, k = K;
+  while (0 < k) {
+    ma += k % 10;
+    k /= 10;
   }
-}
 
-// int main() {
-//   int Q;
-//   cin >> Q;
-//   cumulative[0] = 0;
-//   cumulative[1] = 0;
-//   rep3(i, 2, 100001) {
-//     if (i % 2 == 0) {
-//       cumulative[i] = cumulative[i-1];
-//       continue;
-//     }
-//     if (is_prime(i) && is_prime((i + 1) / 2)) {
-//       cumulative[i] = cumulative[i-1] + 1;
-//     } else {
-//       cumulative[i] = cumulative[i-1];
-//     }
-//   }
-//   rep(i, Q) {
-//     int l, r;
-//     cin >> l >> r;
-//     cout << cumulative[r] - cumulative[l-1] << endl;
-//   }
-//   return 0;
-// }
+  rep3(ans, 1, ma) if (f(ans, 0) == 1) {
+    printf("%d\n", ans);
+    return;
+  }
+  printf("%d\n", ma);
+}

@@ -1,43 +1,81 @@
-// g++ -o b.out b.cpp -std=c++17
-// oj d https://atcoder.jp/contests/abc226/tasks/abc226_b
-// oj t -c "./b.out"
-// oj s https://atcoder.jp/contests/abc226/tasks/abc226_b b.cpp
-
-
+// ここは競プロではサボりがちです
 #include <bits/stdc++.h>
-#define rep(i, n) for (int i = 0; i < (n); ++i)
 using namespace std;
+
+// デバッグ用マクロです。詳しくは https://naskya.net/post/0002/
+#ifdef LOCAL
+#include <debug_print.hpp>
+#define debug(...) debug_print::multi_print(#__VA_ARGS__, __VA_ARGS__)
+#else
+#define debug(...) (static_cast<void>(0))
+#endif
+
+// 節操ないですが、競プロでは便利です。
 using ll = long long;
-using P = pair<int, int>;
+using vi = vector<int>;
+using vl = vector<long long>;
+using vs = vector<string>;
+using vc = vector<char>;
+using vb = vector<bool>;
+using vpii = vector<pair<int, int>>;
+using vpll = vector<pair<long long, long long>>;
+using vvi = vector<vector<int>>;
+using vvl = vector<vector<long long>>;
+using vvc = vector<vector<char>>;
+using vvb = vector<vector<bool>>;
+using vvvi = vector<vector<vector<int>>>;
+using pii = pair<int, int>;
 
+map<int, int> mp;
+long long mod = 1000000007;
+vector<ll> G[1 << 18];
 
-int main()
-{
-  int N;
+// ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
+// #include <atcoder/all>
+// using namespace atcoder;
+
+// 競プロerはrepマクロが大好き
+#define rep(i, n) for (int i = 0; i < (int)(n); i++)
+#define rep3(i,a,b) for(int i=a;i<b;i++)
+#define fore(i,a) for(auto &i:a)
+#define all(x) (x).begin(), (x).end()
+
+// 無くても困らない, 2^30, 約10億 = 10^9
+#define INFTY (1 << 30)
+
+// 浮動小数点の誤差を考慮した等式ですが、使わずに済むなら使わない方が確実です
+#define EPS (1e-7)
+#define equal(a, b) (fabs((a) - (b)) < EPS)
+
+// DPやlong longの最大値最小値更新で重宝します。
+template <typename T>
+inline bool chmax(T &a, T b) {
+  return ((a < b) ? (a = b, true) : (false));
+}
+template <typename T>
+inline bool chmin(T &a, T b) {
+  return ((a > b) ? (a = b, true) : (false));
+}
+
+int main() {
+  ll N;
   cin >> N;
-  vector<int> L(N);
-  vector<vector<int>> A(N, vector<int>());
-  for (int i = 0; i < N; ++i) {
-    int l;
-    cin >> l;
-    L[i] = l;
-    for (int j = 0; j < l; ++j) {
-      int a;
-      cin >> a;
-      A[i].push_back(a);
+  ll A[N], P[N], X[N];
+  rep(i, N) cin >> A[i] >> P[i] >> X[i];
+  ll ans = INFTY;
+  rep(i, N) {
+    if (A[i] < X[i]) {
+      chmin(ans, P[i]);
     }
   }
-  vector<string> strings;
 
-  for (int i = 0; i < N; ++i) {
-    string S = "";
-    for (int k = 0; k < L[i]; ++k) {
-      S += to_string(A[i][k]);
-      S += " ";
-    }
-    strings.push_back(S);
+  if (ans == INFTY) {
+    cout << -1 << endl;
+  } else {
+    cout << ans << endl;
   }
-  sort(strings.begin(), strings.end());
-  strings.erase(unique(strings.begin(), strings.end()), strings.end());
-  cout << strings.size() << endl;
+
+
+ 
+  return 0;
 }

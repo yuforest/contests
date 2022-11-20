@@ -60,24 +60,24 @@ int ans[2010];
 int N, M;
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N, Q;
+  cin >> N >> Q;
+  vl chips(N+2, 0);
+  rep(i, Q) {
+    ll l, r;
+    cin >> l >> r;
+    chips[l]++;
+    chips[r+1]--;
+  }
+  rep3(i, 1, N+1) {
+    chips[i] = chips[i-1] + chips[i];
+  }
+  debug(chips);
+  string ans = "";
+  rep3(i, 1, N+1) {
+    if(chips[i] % 2 == 1) ans += '1';
+    else ans += '0';
   }
   cout << ans << endl;
-
   return 0;
 }

@@ -61,62 +61,41 @@ int ans[2010];
 int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
+  int N;
+  cin>>N;
+
+  // 整数jが書かれているボールが左から何番目かを表す変数 pos[j] を管理する
+  vector<int> val(N+1),pos(N+1);
+  for(int i=1;i<=N;i++) val[i] = i,pos[i] = i;
+
+  int Q;
+  cin>>Q;
+
+  vector<int> x(Q);
+  for(int i=0;i<Q;i++) cin>>x[i];
+
+  for(int i=0;i<Q;i++){
+    // 移動前のポジション
+    int p0 = pos[x[i]];
+    // 移動後のポジション
+    int p1 = p0;
+    // 右端でなければインクリメント
+    if(p0!=N)p1++;
+    // 右端ならデクリメント
+    else p1--;
+    // 移動元の値
+    int v0 = val[p0];
+    // 移動先の値
+    int v1 = val[p1];
+    swap(val[p0], val[p1]);
+    swap(pos[v0], pos[v1]);
   }
 
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
+  for(int i=1;i<=N;i++){
+    if(i!=1)cout<<' ';
+    cout<<val[i];
   }
+  cout<<endl;
 
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
-    }
-  }
-  cout << ans << endl;
   return 0;
 }

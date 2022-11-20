@@ -60,31 +60,23 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  ll A, B, C, D;
+  cin >> A >> B >> C >> D;
+  ll blue = A;
+  ll red = 0;
+  ll ans = 0;
+  rep(i, 100000) {
+    blue += B;
+    red += C;
+    debug(blue <= D * red);
+    if (blue <= D * red) {
+      ans = i+1;
+      break;
+    }
+    if (i == 999) {
+      ans = -1;
+    }
   }
+  cout << ans << endl;
   return 0;
 }

@@ -60,24 +60,56 @@ int ans[2010];
 int N, M;
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
+  string S;
+  cin >> S;
+  vi mi_or_si;
+  rep(i, 19) {
+    if (S[i] == 'W' && S[i+1] == 'W') {
+      mi_or_si.push_back(i);
+    }
+  }
+  bool is_mi = false;
+  bool is_si = true;
+  if (mi_or_si[1] - mi_or_si[0] == 7) {
+    is_si = false;
+    is_mi = true;
+  }
+  debug(mi_or_si);
+  debug(is_mi);
+  debug(is_si);
+  int count = mi_or_si[0];
+  string ans;
+  if (is_mi) {
+    ans = "Mi";
   } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+    ans = "Si";
+  }
+  debug(count);
+  while(count > 0) {
+    debug(ans);
+    if (ans == "Mi") {
+      count -= 2;
+      ans = "Re";
+    } else if (ans == "Re") {
+      count -= 2;
+      ans = "Do";
+    } else if (ans == "Do") {
+      count -= 1;
+      ans = "Si";
+    } else if (ans == "Si") {
+      count -= 2;
+      ans = "La";
+    } else if (ans == "La") {
+      count -= 2;
+      ans = "So";
+    } else if (ans == "So") {
+      count -= 2;
+      ans = "Fa";
+    } else if (ans == "Fa") {
+      count -= 1;
+      ans = "Mi";
+    }
   }
   cout << ans << endl;
-
   return 0;
 }

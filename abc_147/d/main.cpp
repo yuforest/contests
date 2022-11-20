@@ -56,100 +56,69 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+// 整数をmodで扱えるもの
+//---------------------------------------------------------------------------------------------------
+template<int MOD> struct ModInt {
+    static const int Mod = MOD;
+    unsigned x;
+    ModInt() : x(0) { }
+    ModInt(signed sig) { x = sig < 0 ? sig % MOD + MOD : sig % MOD; }
+    ModInt(signed long long sig) { x = sig < 0 ? sig % MOD + MOD : sig % MOD; }
+    int get() const { return (int)x; }
+    ModInt &operator+=(ModInt that) { if ((x += that.x) >= MOD) x -= MOD; return *this; }
+    ModInt &operator-=(ModInt that) { if ((x += MOD - that.x) >= MOD) x -= MOD; return *this; }
+    ModInt &operator*=(ModInt that) { x = (unsigned long long)x * that.x % MOD; return *this; }
+    ModInt &operator/=(ModInt that) { return *this *= that.inverse(); }
+    ModInt operator+(ModInt that) const { return ModInt(*this) += that; }
+    ModInt operator-(ModInt that) const { return ModInt(*this) -= that; }
+    ModInt operator*(ModInt that) const { return ModInt(*this) *= that; }
+    ModInt operator/(ModInt that) const { return ModInt(*this) /= that; }
+    ModInt inverse() const { long long a = x, b = MOD, u = 1, v = 0;
+        while (b) { long long t = a / b; a -= t * b; std::swap(a, b); u -= t * v; std::swap(u, v); }
+        return ModInt(u); }
+    bool operator==(ModInt that) const { return x == that.x; }
+    bool operator!=(ModInt that) const { return x != that.x; }
+    ModInt operator-() const { ModInt t; t.x = x == 0 ? 0 : Mod - x; return t; }
+};
+template<int MOD> ostream& operator<<(ostream& st, const ModInt<MOD> a) { st << a.get(); return st; };
+// 繰り返し二乗法を用いて計算している
+template<int MOD> ModInt<MOD> operator^(ModInt<MOD> a, unsigned long long k) {
+  ModInt<MOD> r = 1;
+  while (k) {
+    if (k & 1) r *= a;
+    a *= a;
+    k >>= 1;
   }
-  return s;
+  return r;
 }
+typedef ModInt<1000000007> mint;
 
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
+int N; ll A[301010];
 int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
-  }
+  cin >> N;
+  rep(i, N) cin >> A[i];
 
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
+  // XORの計算は桁ごとに考えることができる
+  // よって桁ごとに総和を求めて、その総和を取ることで答えを導く
+   mint ans = 0;
+  // 59bitまで計算する
+  // 計算量は60*300000=18000000程度、O(60N)
+  rep3(b, 0, 60) {
+    // 1をb回左シフト、2^b乗するのと同じ
+    ll msk = 1LL << b;
 
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
+    int zero = 0, one = 0;
+    // Aの配列を全探索
+    rep3(i, 0, N) {
+      // 現在のbitで0の出現回数と1の出現回数を数える
+      if (A[i] & msk) one++;
+      else zero++;
+    }
+    // この中でXORを取って1になる組み合わせはzero*one通りであるため、
+    // (その桁が0のものと1のものを組み合わせる必要があるため)
+    // 総和もzero*one*現在の桁(2^左シフトした回数)となる
+    ans += mint(msk) * zero * one;
   }
-  cout << res << "\n";
+  cout << ans << endl;
   return 0;
 }

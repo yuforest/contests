@@ -60,14 +60,9 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  string A = "atcoder";
-  int L, R;
-  cin >> L >> R;
-  L--;
-  R--;
-  for(int i = L; i <= R;i++ ) {
-    cout << A[i];
-  }
-  cout << endl;
+  vi a(3);
+  rep(i, 3) cin >> a[i];
+  sort(a.begin(), a.end());
+  cout << a[1] << endl;
   return 0;
 }

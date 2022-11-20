@@ -61,29 +61,20 @@ int N, M;
 
 int main() {
   cin >> N;
-  string S[N];
+  map<string, int> mp;
+  int best_point = 0;
+  int best = 0;
   rep(i, N) {
-    cin >> S[i];
-  }
-  int ans = 10000;
-
-  for(int i = 0; i <= 9; i++) {
-    char current = i + '0';
-    map<int, int> mp;
-    rep(i, N) {
-      int index = S[i].find(current);
-      mp[index]++;
+    string s;
+    int t;
+    cin >> s >> t;
+    if (mp[s] > 0) continue;
+    mp[s]++;
+    if (best_point < t) {
+      best_point = t;
+      best = i + 1;
     }
-    int tmp = 0;
-    for (auto x : mp) {
-      if (x.second == 1) {
-        tmp = max(tmp, x.first);
-      } else {
-        tmp = max(tmp, x.first + (x.second - 1) * 10);
-      }
-    }
-    ans = min(ans, tmp);
   }
-  cout << ans << endl;
+  cout << best << endl;
   return 0;
 }

@@ -61,62 +61,30 @@ int ans[2010];
 int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
+  ll N, M;
+  cin >> N >> M;
+  ll B[N][M];
+  rep(i, N) {
+    rep(j, M) {
       cin >> B[i][j];
     }
   }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
+  string ans = "Yes";
+  ll current = B[0][0];
+  // (current-1)%7+1でも良い
+  ll current_mod = current % 7 == 0 ? 7 : current % 7;
+  ll start_mod = current % 7 == 0 ? 7 : current % 7;
+  rep(i, N) {
+    rep(j, M) {
+      if (current_mod > 7) ans = "No";
+      if (B[i][j] != current) ans = "No";
+      current++;
+      current_mod++;
     }
+    current_mod = start_mod;
+    current += 7 - M;
   }
   cout << ans << endl;
+
   return 0;
 }

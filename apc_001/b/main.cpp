@@ -59,24 +59,29 @@ inline bool chmin(T &a, T b) {
 
 int ans[2010];
 
+int y,m,d;
+// 一年間の月の日数が入っている配列
+int a[13]={0,31,28,31,30,31,30,31,31,30,31,30,31};
+char ch;
+
+// 閏年かどうかを判定する関数
+inline bool leap(int year) {
+  // 4で割り切れるが100で割り切れない年、ただし400で割り切れる時は閏年
+	return (!(year%4) && year%100 || !(year%400));
+}
+
 int main() {
-  int N;
-  cin >> N;
-  ll A[N], B[N];
-  rep(i, N) {
-    cin >> A[i];
+  scanf("%d/%d/%d", &y, &m, &d);
+  // 今が閏年なら2月を29日に
+  if(leap(y)) a[2]++;
+  while(y % (d * m)) {
+    ++d;
+    // 日が月の日数より大きくなったら月を進めて日をリセット
+    if(d > a[m]) m++,d=1;
+    // 月が12より大きくなったら、年をすすめて月をリセット
+    if (m>12) ++y,m=1;
   }
-  rep(i, N) {
-    cin >> B[i];
-  }
-  long long biggerA = 0, biggerB = 0;
-  for (int i = 0; i < N; ++i) {
-    // Aの方が大きい場所の操作が最低限必要な回数(1を増やすべき回数)
-    if (A[i] > B[i]) biggerA += A[i] - B[i];
-    // Bの方が大きい場所の操作が最低限必要な回数(2を増やすべき回数)
-    if (B[i] > A[i]) biggerB += (B[i] - A[i]) / 2;
-  }
-  if (biggerB >= biggerA) cout << "Yes" << endl;
-    else cout << "No" << endl;
+  // 月と日は2桁で表示するために下記のようにしている
+  cout << y << '/' << m/10 << m%10 << '/' << d/10 << d%10 << endl;
   return 0;
 }

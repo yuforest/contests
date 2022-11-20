@@ -15,29 +15,15 @@ int main()
 {
   int N;
   cin >> N;
-  vector<int> L(N);
-  vector<vector<int>> A(N, vector<int>());
-  for (int i = 0; i < N; ++i) {
-    int l;
-    cin >> l;
-    L[i] = l;
-    for (int j = 0; j < l; ++j) {
-      int a;
-      cin >> a;
-      A[i].push_back(a);
-    }
+  char S[N];
+  map<int, int> mp;
+  rep(i, N) {
+    cin >> S[i];
+    mp[S[i]]++;
   }
-  vector<string> strings;
-
-  for (int i = 0; i < N; ++i) {
-    string S = "";
-    for (int k = 0; k < L[i]; ++k) {
-      S += to_string(A[i][k]);
-      S += " ";
-    }
-    strings.push_back(S);
+  if (mp.size() == 3) {
+    cout << "Three" << endl;
+  } else if (mp.size() == 4) {
+    cout << "Four" << endl;
   }
-  sort(strings.begin(), strings.end());
-  strings.erase(unique(strings.begin(), strings.end()), strings.end());
-  cout << strings.size() << endl;
 }

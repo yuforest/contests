@@ -59,31 +59,8 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  ll N, K;
-  cin >> N >> K;
-  ll A[K];
-  rep(i, K) {
-    cin >> A[i];
-    A[i]--;
-  }
-  ll X[N], Y[N];
-  rep(i, N) {
-    cin >> X[i] >> Y[i];
-  }
-  vector<ll> distances(N, LLONG_MAX);
-  rep(i, K) {
-    rep(j, N) {
-      ll light = A[i];
-      ll dist = abs(X[light] - X[j]) * abs(X[light] - X[j]) + abs(Y[light] - Y[j]) * abs(Y[light] - Y[j]);
-      debug(dist);
-      distances[j] = min(distances[j], dist);
-    }
-  }
-  ll ans = 0;
-  rep(i, N) {
-    debug(distances[i]);
-    ans = max(ans, distances[i]);
-  }
-  cout << fixed << setprecision(10) << sqrt(ans) << endl;
+  ll X;
+  cin >> X;
+  cout << sqrt(sqrt(X)) << endl;
   return 0;
 }

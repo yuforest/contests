@@ -59,31 +59,37 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  ll N, K;
-  cin >> N >> K;
-  ll A[K];
-  rep(i, K) {
-    cin >> A[i];
-    A[i]--;
-  }
-  ll X[N], Y[N];
+  string S;
+  cin >> S;
+  int T;
+  cin >> T;
+  int N = S.size();
+  int x = 0;
+  int y = 0;
+  int unknown_count = 0;
   rep(i, N) {
-    cin >> X[i] >> Y[i];
+    if (S[i] == 'L') x--;
+    if (S[i] == 'R') x++;
+    if (S[i] == 'U') y++;
+    if (S[i] == 'D') y--;
+    if (S[i] == '?') unknown_count++;
   }
-  vector<ll> distances(N, LLONG_MAX);
-  rep(i, K) {
-    rep(j, N) {
-      ll light = A[i];
-      ll dist = abs(X[light] - X[j]) * abs(X[light] - X[j]) + abs(Y[light] - Y[j]) * abs(Y[light] - Y[j]);
-      debug(dist);
-      distances[j] = min(distances[j], dist);
+  int distance = abs(x) + abs(y);
+  int ans;
+  if (T == 1) {
+    ans = distance + unknown_count;
+  } else if (T == 2) {
+    // マンハッタン距離は最小で0
+    if ((distance - unknown_count) >= 0) {
+      ans = distance - unknown_count;
+    } else {
+      if ((distance - unknown_count) % 2 == 0) {
+        ans = 0;
+      } else {
+        ans = 1;
+      }
     }
   }
-  ll ans = 0;
-  rep(i, N) {
-    debug(distances[i]);
-    ans = max(ans, distances[i]);
-  }
-  cout << fixed << setprecision(10) << sqrt(ans) << endl;
+  cout << ans << endl;
   return 0;
 }

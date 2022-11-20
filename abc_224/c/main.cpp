@@ -61,60 +61,22 @@ int ans[2010];
 int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
+  int N;
+  cin >> N;
+  ll X[N], Y[N];
+  rep(i, N) cin >> X[i] >> Y[i];
+  // 1/2|(x2 - x1)(y3-y1) - (x3-x1)(y2-y1)|が三点を通る三角形の面積
+  // 今回は絶対値の中身が0かどうかを調べれば3点が一直線上にあるかを調べることができる
+  ll ans = 0;
+  rep3(i, 0, N) {
+    rep3(j, i+1, N) {
+      rep3(k, j+1, N) {
+        // double m1 = (Y[i] - Y[j]) / (X[i] - X[j]);
+        // double m2 = (Y[j] - Y[k]) / (X[j] - X[k]);
+        ll d1 = (Y[j] - Y[k]) * (X[i] - X[j]);
+        ll d2 = (Y[i] - Y[j]) * (X[j] - X[k]);
+        if (d1 != d2) ans++;
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
     }
   }
   cout << ans << endl;

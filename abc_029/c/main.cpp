@@ -56,28 +56,21 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
+int N;
+void dfs(string current) {
+  if (current.size() == N) {
+    cout << current << endl;
+    return;
+  }
+  dfs(current + "a");
+  dfs(current + "b");
+  dfs(current + "c");
+}
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
-  }
-  cout << ans << endl;
+  cin >> N;
+
+  dfs("");
 
   return 0;
 }

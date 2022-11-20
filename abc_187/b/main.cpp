@@ -60,31 +60,22 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  int N;
+  cin >> N;
+  double x[N], y[N];
+  rep(i, N) cin >> x[i] >> y[i];
+  int ans = 0;
+  rep(i, N) {
+    rep3(j, i+1, N) {
+      debug((x[i] - x[j]));
+      debug((y[i] - y[j]));
+      double m = (y[i] - y[j]) / (x[i] - x[j]);
+      debug(m);
+      // これで求められる
+      // if(abs(y1 - y2) <= abs(x1 - x2)) ans++;
+      if (m >= -1 && m <= 1) ans++;
+    }
   }
+  cout << ans << endl;
   return 0;
 }

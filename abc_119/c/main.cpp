@@ -57,40 +57,46 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
 
-vector<int> honests[15];
-vector<int> liars[15];
+int N, A, B, C, L[10];
+int ans = INT_MAX;
+// A,B,Cの中でどの長さで使っているかを保存する配列
+int flag[8];
+
+void dfs(int cu) {
+  // 最後の竹まで見たらMP計算
+  if (cu == N) {
+    int a = 0, b = 0, c = 0;
+    int ca = 0, cb = 0, cc = 0;
+    // 長さと使っている竹の本数を計算
+    rep3(i, 0, N) {
+      if (flag[i] == 0) a += L[i], ca++;
+      else if (flag[i] == 1) b += L[i], cb++;
+      else if (flag[i] == 2) c += L[i], cc++;
+    }
+    // 使っている竹が0本の場合はreturn
+    if (0 == ca or 0 == cb or 0 == cc) return;
+    // 合成魔法のコストを計算
+    int cand = (ca-1) * 10 + (cb-1) * 10 + (cc-1) * 10;
+    // 延長または短縮のコストを計算
+    cand += abs(A - a) + abs(B - b) + abs(C - c);
+    // 最小値の更新
+    chmin(ans, cand);
+    return;
+  }
+
+  // 竹をA,B,Cの中でどれに振り分けるかで全探索
+  // 0->A, 1->B. 2->C, 3->使わないとして振り分けている
+  rep3(i, 0, 4) {
+    flag[cu] = i;
+    dfs(cu + 1);
+  }
+}
 int main() {
-  int N;
-  cin >> N;
-  rep(i, N) {
-    int A;
-    cin >> A;
-    rep(j, A) {
-      int x, y; cin >> x >> y;
-      // 証言したごとに嘘つきの人と正直者に振り分ける
-      if (y == 0) liars[i].push_back(x - 1);
-      else honests[i].push_back(x - 1);
-    }
-  }
+  cin >> N >> A >> B >> C;
+  rep3(i, 0, N) cin >> L[i];
 
-  int ans = 0;
-  // N人をbit全探索
-  rep(msk, 1 << N) {
-    // 矛盾するかどうか
-    bool ok = true;
-    int tot = 0;
-    // フラグが立った人を正直者と判断してその人の証言に矛盾がないかを調べる
-    rep(i, N) if (msk & (1 << i)) {
-      tot++;
-      // 正直者と言われた人が今回嘘つきになっていれば矛盾
-      fore(honest, honests[i]) if (!(msk & (1 << honest))) ok = false;
-      // 嘘つきと言われた人が今回正直者になっている場合は矛盾
-      fore(liar, liars[i]) if (msk & (1 << liar)) ok = false;
-    }
-    if (ok) chmax(ans, tot);
-  }
+  dfs(0);
   cout << ans << endl;
 
   return 0;

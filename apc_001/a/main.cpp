@@ -60,12 +60,23 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int S, W;
-  cin >> S >> W;
-  if (W >= S) {
-    cout << "unsafe" << endl;
-  } else {
-    cout << "safe" << endl;
+  ll X, Y;
+  cin >> X >> Y;
+  if (X == Y) {
+    cout << -1 << endl;
+    return 0;
+  }
+  if (X % Y == 0) {
+    cout << -1 << endl;
+    return 0;
+  }
+  ll ans = X;
+  while(true) {
+    if (ans % Y != 0) {
+      cout << ans << endl;
+      return 0;
+    }
+    ans += X;
   }
   return 0;
 }

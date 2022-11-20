@@ -57,100 +57,48 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+int H, W, A, B;
+//---------------------------------------------------------------------------------------------------
+// 316=43046721なので4*106通りで間に合うかなという印象、ここから次に遷移できないときなどが枝狩りされる
+bool used[16][16];
+// 現在見ている座標と長方形のタイルを使える数
+int dfs(int x, int y, int a) {
+  // 最後まで探索して、長方形のタイルを使い切っているなら、組合せを+1する
+  if (H == y) return a == 0;
 
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
+  // 横の端まで行ったら次の行へ
+  if (W == x) return dfs(0, y + 1, a);
 
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
-  }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
-  }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
+  // 既に置かれているなら何もできないので、次のマスへ
+  if (used[y][x]) return dfs(x + 1, y, a);
 
   int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
+
+  // 縦置き(高さがはみ出していない、下のマスが使用済みでない、長方形が残っている)
+  if (y + 1 < H && !used[y + 1][x] && 0 < a) {
+    // 現在のマスとその下のマスに配置
+    used[y][x] = used[y + 1][x] = true;
+    // 横に遷移していく
+    res += dfs(x + 1, y, a - 1);
+    used[y][x] = used[y + 1][x] = false;
   }
-  cout << res << "\n";
+
+  // 横置き(幅がはみ出していない、右のマスが使用済みでない、長方形が残っている)
+  if (x + 1 < W && !used[y][x + 1] && 0 < a) {
+    // 現在のマスとその右のマスに配置
+    used[y][x] = used[y][x + 1] = true;
+    // 横に遷移していく
+    res += dfs(x + 1, y, a - 1);
+    used[y][x] = used[y][x + 1] = false;
+  }
+
+  // 何も置かない
+  res += dfs(x + 1, y, a);
+
+  return res;
+}
+int main(){
+  cin >> H >> W >> A >> B;
+  cout << dfs(0, 0, A) << endl;
   return 0;
 }

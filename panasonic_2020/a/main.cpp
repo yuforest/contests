@@ -63,9 +63,9 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int X, Y, N;
-  cin >> X >> Y >> N;
-  int ans = min(X * N, Y * (N/3) + (N % 3) * X);
-  cout << ans << endl;
+  int K;
+  cin >> K;
+  vi A = {1, 1, 1, 2, 1, 2, 1, 5, 2, 2, 1, 5, 1, 2, 1, 14, 1, 5, 1, 5, 2, 2, 1, 15, 2, 2, 5, 4, 1, 4, 1, 51};
+  cout << A[K-1] << endl;
   return 0;
 }

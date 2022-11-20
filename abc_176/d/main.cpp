@@ -57,100 +57,82 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
-  }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
+bool used[1000][1000];
+int INF = 100000000;
+vvi dp(1001, vector<int>(1001, INF));
+int dx[4] = { 0, 1, 0, -1 }, dy[4] = { -1, 0, 1, 0 };
+int warp_x[5] = { -2, -1, 0, 1, 2 }, warp_y[5] = { -2, -1, 0, 1, 2 };
 
 int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
-  }
+  int H, W;
+  cin >> H >> W;
+  int ch, cw, dh, dw;
+  cin >> ch >> cw >> dh >> dw;
+  ch--;cw--;dh--;dw--;
+  string S[H];
+  rep(i, H) cin >> S[i];
 
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
+  // 普通のqueueの代わりにdequeを使う
+  // また、移動におけるコストが 0 と 1 だけの場合は、01-BFSと呼ばれる実装が可能となります
+  // dequeを使用し、コストが 0 の移動先の頂点はdequeの先頭に、
+  // コストが1の移動先の頂点はdequeの末尾に追加することで、距離順に探索をすることが可能となります。
+  // 暫定最短距離が最も小さい頂点を選んで、そこから伸びる辺で他の頂点の暫定最短距離を更新する
+  deque<pair<int, int>>que;
+  que.push_back({ch, cw});
+  dp[ch][cw] = 0;
 
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
+  // 幅優先探索
+  // 移動Aで移動可能な場所まで移動し、ゴールにたどり着けないのであれば、移動Bを用いて、移動Aだけでは移動出来ない場所に移動する
+  while (!que.empty()) {
+    // dequeを前から取り出す
+    auto q = que.front();
+    que.pop_front();
+    int x, y;
+    tie(x, y) = q;
+
+    // 上下左右への移動
+    bool wall_present = false;
+    rep(i, 4) {
+      int xx = x + dx[i];
+      int yy = y + dy[i];
+      if (xx < 0 || xx >= H) continue;
+      if (yy < 0 || yy >= W) continue;
+      if (S[xx][yy] == '#') {
+        wall_present = true;
+        continue;
+      }
+      // 他の探索経路から同じ場所を探索してしまうことがあるので
+      // この時点で訪問済みにして距離も入れておくと良い
+      if (dp[xx][yy] <= dp[x][y]) continue;
+      dp[xx][yy] = dp[x][y];
+      // 距離0で移動できるので前から追加
+      que.push_front({xx, yy});
+    }
+    // ワープの移動
+    rep(i, 5) {
+      rep(j, 5) {
+        // その場に止まったり、歩いて行ける範囲は除く
+        if (warp_x[i] == 0 && warp_y[j] == 0) continue;
+        if (warp_x[i] == 1 && warp_y[j] == 0) continue;
+        if (warp_x[i] == -1 && warp_y[j] == 0) continue;
+        if (warp_x[i] == 0 && warp_y[j] == 1) continue;
+        if (warp_x[i] == 0 && warp_y[j] == -1) continue;
+        int xx = x + warp_x[i];
+        int yy = y + warp_y[j];
+        if (xx < 0 || xx >= H) continue;
+        if (yy < 0 || yy >= W) continue;
+        if (S[xx][yy] == '#') continue;
+        // 遷移先が今の地点から遷移するよりワープ回数が小さければcontinue
+        if (dp[xx][yy] <= dp[x][y] + 1) continue;
+        // ワープ回数を追加
+        dp[xx][yy] = dp[x][y] + 1;
+         // 距離1で移動できるので後ろから追加
+        que.push_back({xx, yy});
+      }
+    }
   }
-  cout << res << "\n";
+  if (dp[dh][dw] == INF) cout << -1 << endl;
+  else cout << dp[dh][dw] << endl;
+
   return 0;
 }

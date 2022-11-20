@@ -56,34 +56,37 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+// greatest common divisor
+ll gcd(ll a, ll b) { return a ? gcd(b % a, a) : b; }
+// least common multiple
+ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
 
 int main() {
-  ll N, K;
-  cin >> N >> K;
-  ll A[K];
-  rep(i, K) {
-    cin >> A[i];
-    A[i]--;
-  }
-  ll X[N], Y[N];
+  int N;
+  cin >> N;
+  vi a(N);
+  int sum = 0;
   rep(i, N) {
-    cin >> X[i] >> Y[i];
+    cin >> a[i];
+    sum += a[i];
   }
-  vector<ll> distances(N, LLONG_MAX);
-  rep(i, K) {
-    rep(j, N) {
-      ll light = A[i];
-      ll dist = abs(X[light] - X[j]) * abs(X[light] - X[j]) + abs(Y[light] - Y[j]) * abs(Y[light] - Y[j]);
-      debug(dist);
-      distances[j] = min(distances[j], dist);
+  if (sum % N != 0) {
+    cout << -1 << endl;
+    return 0;
+  }
+  int avg = sum / N;
+  int ans = 0;
+  // 隣あう島ごとに人の移動が必要かを判定
+  rep(i, N-1) {
+    // 平均と同じでなければ必要
+    if(a[i] != avg) {
+      ans++;
+      // 隣の島に人を移していく
+      a[i+1] += a[i] - avg;
     }
   }
-  ll ans = 0;
-  rep(i, N) {
-    debug(distances[i]);
-    ans = max(ans, distances[i]);
-  }
-  cout << fixed << setprecision(10) << sqrt(ans) << endl;
+  cout << ans << endl;
+
+
   return 0;
 }

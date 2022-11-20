@@ -57,100 +57,33 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+const int MA = 1000001;
+int N, A[201010];
+int cnt[1010101];
+bool ok[1010101];
+int main() {
+  cin >> N;
+  rep3(i, 0, N) cin >> A[i];
 
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
+  // 配列に登場した数字をカウント
+  rep3(i, 0, N) cnt[A[i]]++;
+  // 全てをtrueで初期化
+  rep3(x, 1, MA) ok[x] = true;
 
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
-  }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
+  // 調和級数的計算量になる
+  // rep(i,1,N) for(j=i;j<=N;j+=i) というループ構造はO(NlogN)で行える
+  // 1回以上登場していたら
+  rep3(x, 1, MA) if(0 < cnt[x]) {
+    // 2回以上登場していたらその数自身も使えない
+    if (1 < cnt[x]) ok[x] = false;
+    // その数の倍数をfalseに変更する
+    // ここの計算量がlog(N)となる
+    // 数字が増える度に探索すべき数は加速度的に減っていくため
+    for (int x2 = x * 2; x2 < MA; x2 += x) ok[x2] = false;
   }
 
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
-  return 0;
+  // A[i]を探索してokがtrueになっているものをカウントする
+  int ans = 0;
+  rep3(i, 0, N) if (ok[A[i]]) ans++;
+  cout << ans << endl;
 }

@@ -60,5 +60,20 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
+  int N;
+  cin >> N;
+  int a[N];
+  rep(i, N) cin >> a[i];
+  int S = 0;
+  rep(i, N) {
+    S ^= a[i];
+  }
+  debug(S);
+  rep(i, N) {
+    if (i) cout << " ";
+    int val = a[i] ^ S;
+    cout << val;
+  }
+  cout << endl;
   return 0;
 }

@@ -55,29 +55,55 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
+vvl graph(21);
 
-int ans[2010];
-int N, M;
+ll dfs(ll pos) {
+  if (graph[pos].empty()) return 1LL;
+  ll min_salary = 1e18;
+  ll max_salary = 0;
+  for(auto x: graph[pos]) {
+    ll salary = dfs(x);
+    chmin(min_salary, salary);
+    chmax(max_salary, salary);
+  }
+  return min_salary + max_salary + 1;
+}
+
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N;
+  cin >> N;
+  ll B[N];
+  rep3(i, 2, N+1) {
+    cin >> B[i];
+    graph[B[i]].push_back(i);
   }
+  debug(graph);
+  ll ans = dfs(1);
+
   cout << ans << endl;
 
   return 0;
 }
+
+
+// 20
+// 1
+// 2
+// 3
+// 4
+// 5
+// 6
+// 7
+// 8
+// 9
+// 10
+// 11
+// 12
+// 13
+// 14
+// 15
+// 16
+// 17
+// 18
+// 19

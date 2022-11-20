@@ -9,17 +9,19 @@ using namespace std;
 using ll = long long;
 using P = pair<int, int>;
 
+int prize(int num) {
+  if (num == 3) return 100000;
+  if (num == 2) return 200000;
+  if (num == 1) return 300000;
+  return 0;
+}
 int main()
 {
-  int X;
-  cin >> X;
-  if (X < 40) {
-    cout << 40 - X << endl;
-  } else if (X < 70) {
-    cout << 70 - X << endl;
-  } else if (X < 90) {
-    cout << 90 - X << endl;
-  } else {
-    cout << "expert" << endl;
-  }
+  int X, Y;
+  cin >> X >> Y;
+  int ans = 0;
+  ans += prize(X);
+  ans += prize(Y);
+  if (X == 1 && Y == 1) ans += 400000;
+  cout << ans << endl;
 }

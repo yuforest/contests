@@ -57,66 +57,45 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
 
+// int main() {
+//   ll N;
+//   cin >> N;
+//   string alphabets = "abcdefghijklmnopqrstuvwxyz";
+//   vi base26;
+//   while(N > 0) {
+//     if (N % 26 == 0) {
+//       base26.push_back(26);
+//       N /= 26;
+//       N -= 1;
+//     } else {
+//       base26.push_back(N % 26);
+//       N /= 26;
+//     }
+//   }
+//   reverse(base26.begin(), base26.end());
+//   debug(base26);
+//   string ans = "";
+//   rep(i, base26.size()) {
+//     ans += alphabets[base26[i]-1];
+//   }
+//   cout << ans << endl;
+
+//   return 0;
+// }
+
+
+ll N;
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
+  cin >> N;
 
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
-    }
+  string ans = "";
+  while (0 < N) {
+    // ここで引くことにより0が使えない分を扱える
+    N--;
+    int m = N % 26;
+    ans = char('a' + m) + ans;
+    N /= 26;
   }
   cout << ans << endl;
-  return 0;
 }

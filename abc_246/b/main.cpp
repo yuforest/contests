@@ -60,31 +60,20 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
-  }
+  int A, B;
+  cin >> A >> B;
+  double distance = sqrt(A * A + B * B);
+  double x = A / distance;
+  double y = B / distance;
+  cout << fixed << setprecision(18) << x << " " << y << endl;
   return 0;
 }
+
+// 偏角を求めても解ける
+// int main(){
+//   int x,y;
+//   cin >> x >> y;
+//   double theta=atan2((double)y,(double)x);
+//   cout << cos(theta) << ' ' << sin(theta) << '\n';
+//   return 0;
+// }

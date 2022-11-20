@@ -58,99 +58,64 @@ inline bool chmin(T &a, T b) {
 }
 
 
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+constexpr int MAX = 30;
+long long dp[MAX + 1][MAX + 1];
+// Aの使える回数とBの使える回数と辞書順で何番目の文字列かを示す数を引数に取る
+string find_kth(int A, int B, long long K) {
+  if (A == 0) {
+    // bがB個からなる文字列
+    return string(B, 'b');
   }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
+  if (B == 0) {
+    // aがA個からなる文字列
+    return string(A, 'a');
+  }
+  // 先頭から決めていっている
+  // aが選択された場合は答えに追加するだけでいいが、
+  // bが選択された場合は、a?????????がスキップされることになる
+  debug(K);
+  debug(dp[A - 1][B]);
+  // dp[A - 1][B]は先頭にaを選んだ場合の他の文字の並べ方の組み合わせを示しているので
+  // K <= dp[A - 1][B]であれば、先頭にaを配置した後に
+  // 残りの文字を並べることによってK番目の文字列を作ることができることを示している
+  if (K <= dp[A - 1][B]) {
+    // aが先頭に来るということはbが先頭に来るのと比べて辞書順の並びをスキップしていない
+    // ことになる
+    // よってaを使える回数を1減らして再帰関数を実行すればよい
+    return string("a") + find_kth(A - 1, B, K);
+  } else {
+    // この時はaをA-1個、bをB個使った文字列がスキップされていることになる
+    // bが先頭に近い方にくるということは辞書順でaが先にくる文字列をスキップしていると
+    // いうことになる
+    // example: A=2, B=2, K=4
+    // ここでbを用いるということはここにaが来た場合にありうるaabb, abba, ababという
+    // 3つの文字列をスキップしていることになる
+    // スキップした後はaを2個、bを1個使った文字列でK-3=4-3=1番目の文字列を
+    // 求めれば良いのでK - dp[A - 1][B]として再帰関数を実行する
+    return string("b") + find_kth(A, B - 1, K - dp[A - 1][B]);
   }
 }
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
+int main() {
+  int A, B;
+  long long K;
+  cin >> A >> B >> K;
+  // aがi個bがj個からなる文字列の総数をあらかじめ計算しておく
+  // (0,0)からスタートし、x軸の正の方向あるいはy軸の正の方向に1進むことを繰り返して(i,j)に至る方法の総数に等しい
+  // つまり空文字列から始まって選ぶものがa or bのみなのでi方向への移動をaを選ぶという行動、
+  // j方向への移動をbを選ぶという行動に対応させることができる
+  // i=0,j=0の時空文字列
+  dp[0][0] = 1;
+  for (int i = 0; i <= A; ++i) {
+    for (int j = 0; j <= B; ++j) {
+      if (i > 0) {
+        dp[i][j] += dp[i - 1][j];
+      }
+      if (j > 0) {
+        dp[i][j] += dp[i][j - 1];
+      }
+    }
   }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
+  debug(dp);
+  cout << find_kth(A, B, K) << '\n';
   return 0;
 }

@@ -57,41 +57,35 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
-vector<int> honests[15];
-vector<int> liars[15];
+int N, A[201010];
 int main() {
-  int N;
+  // マンハッタン距離の差の総和を最小化するときは中央値を使う
+  // abs(A[1]-(b+1)) + abs(A[2]-(b+2)) + ... + abs(A[N] - (b + N))を変形
+  // abs( (A[1]-1)-b) + abs( (A[2] - 2) - b) + ... + abs( (A[N]-N) - b)
+  // B[i] = A[i] - iとするとabs(B[1] - b) + abs(B[2] - b) + ... + abs(B[N] - b)を最小化する問題
+  // 新しい配列をソートして、その中央値を探し、差の和を取るとそれが最小になる
+  // |x−B1|+|x−B2|+⋯+|x−BN|  を最小にする x は、B1,B2,…,BN のメディアン(Bはソート済み)
+  // xが左側に寄っているときは、右へ動かすと 差の総和を減らすことができる
+  // xが右側に寄っているときも同様に、左へ動かすと 差の総和を減らすことができる
+  // このバランスがとれるのが、ちょうどメディアンの場合
+  // n が偶数の場合はメディアンは2つあって、その間の区間内はすべて最小値
   cin >> N;
   rep(i, N) {
-    int A;
-    cin >> A;
-    rep(j, A) {
-      int x, y; cin >> x >> y;
-      // 証言したごとに嘘つきの人と正直者に振り分ける
-      if (y == 0) liars[i].push_back(x - 1);
-      else honests[i].push_back(x - 1);
-    }
+    cin >> A[i];
+    A[i] -= (i + 1);
   }
+  // ソート
+  sort(A, A + N);
 
-  int ans = 0;
-  // N人をbit全探索
-  rep(msk, 1 << N) {
-    // 矛盾するかどうか
-    bool ok = true;
-    int tot = 0;
-    // フラグが立った人を正直者と判断してその人の証言に矛盾がないかを調べる
-    rep(i, N) if (msk & (1 << i)) {
-      tot++;
-      // 正直者と言われた人が今回嘘つきになっていれば矛盾
-      fore(honest, honests[i]) if (!(msk & (1 << honest))) ok = false;
-      // 嘘つきと言われた人が今回正直者になっている場合は矛盾
-      fore(liar, liars[i]) if (msk & (1 << liar)) ok = false;
-    }
-    if (ok) chmax(ans, tot);
-  }
+  // 中央値を取る、配列の個数が奇数の時と偶数の時で場合分け
+  int b;
+  if (N % 2 == 1) b = A[N / 2];
+  // メディアンが小数になるような場面でも2つのメディアンの区間内は全て最小値になるため問題ない
+  else b = (A[N / 2 - 1] + A[N / 2]) / 2;
+
+  ll ans = 0;
+  // 中央値との差を取っている
+  rep(i, N) ans += abs(A[i] - b);
   cout << ans << endl;
-
   return 0;
 }

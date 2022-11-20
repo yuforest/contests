@@ -58,32 +58,22 @@ inline bool chmin(T &a, T b) {
 
 int ans[2010];
 
+const double PI = acos(-1.0);
 int main() {
-  ll N, K;
-  cin >> N >> K;
-  ll A[K];
-  rep(i, K) {
-    cin >> A[i];
-    A[i]--;
-  }
-  ll X[N], Y[N];
+  int N;
+  cin >> N;
+  vi R(N);
+  rep(i, N) cin >> R[i];
+  sort(R.begin(), R.end(), greater<int>());
+  double ans = 0;
   rep(i, N) {
-    cin >> X[i] >> Y[i];
-  }
-  vector<ll> distances(N, LLONG_MAX);
-  rep(i, K) {
-    rep(j, N) {
-      ll light = A[i];
-      ll dist = abs(X[light] - X[j]) * abs(X[light] - X[j]) + abs(Y[light] - Y[j]) * abs(Y[light] - Y[j]);
-      debug(dist);
-      distances[j] = min(distances[j], dist);
+    int r = R[i];
+    if (i % 2 == 0) {
+      ans += PI * r * r;
+    } else {
+      ans -= PI * r * r;
     }
   }
-  ll ans = 0;
-  rep(i, N) {
-    debug(distances[i]);
-    ans = max(ans, distances[i]);
-  }
-  cout << fixed << setprecision(10) << sqrt(ans) << endl;
+  cout << fixed << setprecision(18) << ans << endl;
   return 0;
 }

@@ -57,34 +57,20 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  int H, W;
+  cin >> H >> W;
+  vvi A(H, vector<int>(W, 0));
+  rep(i, H) rep(j, W) cin >> A[i][j];
+  string ans = "Yes";
+  rep(i, H-1) {
+    rep(j, W-1) {
+      int first = A[i][j] + A[i+1][j+1];
+      int second = A[i+1][j] + A[i][j+1];
+      if (first > second) ans = "No";
+    }
   }
+  cout << ans << endl;
   return 0;
 }

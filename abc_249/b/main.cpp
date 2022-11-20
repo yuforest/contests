@@ -60,31 +60,22 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  string S;
+  cin >> S;
+  map<char, int> mp;
+  rep(i, S.size()) {
+    mp[S[i]]++;
   }
+  string ans = "Yes";
+  bool is_big = false;
+  bool is_small = false;
+  fore(x, mp) {
+    if (x.second != 1) ans = "No";
+    if (x.first >= 'a' && x.first <= 'z') is_small = true;
+    if (x.first >= 'A' && x.first <= 'Z') is_big = true;
+  }
+  if (!is_small) ans = "No";
+  if (!is_big) ans = "No";
+  cout << ans << endl;
   return 0;
 }

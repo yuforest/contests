@@ -61,62 +61,38 @@ int ans[2010];
 int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
+  int N;
+  cin >> N;
+  vi A(pow(2, N));
+  rep(i, pow(2, N)) cin >> A[i];
+  debug(A);
+  vi A_copy = A;
+  if (N == 1) {
+    if (A[0] > A[1]) {
+      cout << 2 << endl;
+    } else {
+      cout << 1 << endl;
     }
+    return 0;
   }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
+  while(true) {
+    vi tmp;
+    rep(i, A_copy.size() / 2) {
+      int first = 2 * i;
+      int second = 2 * i + 1;
+      if (A_copy[first] > A_copy[second]) {
+        tmp.push_back(A_copy[first]);
+      } else {
+        tmp.push_back(A_copy[second]);
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
     }
+    A_copy = tmp;
+    debug(A_copy);
+    if (A_copy.size() == 2) break;
   }
-  cout << ans << endl;
+  int val = min(A_copy[0], A_copy[1]);
+  auto itr = find(A.begin(), A.end(), val);
+  int index = itr - A.begin();
+  cout << index + 1 << endl;
   return 0;
 }

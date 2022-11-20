@@ -60,24 +60,40 @@ int ans[2010];
 int N, M;
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N, D, K;
+  cin >> N >> D >> K;
+  ll L[D], R[D];
+  rep(i, D) cin >> L[i] >> R[i];
+  ll S[K], T[K];
+  rep(i, K) cin >> S[i] >> T[i];
+  rep(i, K) {
+    ll current = S[i];
+    ll destination = T[i];
+    rep(j, D) {
+      if (destination > current) {
+        if (current >= L[j]) {
+          if (destination <= R[j]) {
+            cout << j + 1 << endl;
+            break;
+          } else {
+            // できるだけ右に移動する
+            chmax(current, R[j]);
+          }
+        }
+      } else {
+        if (current <= R[j]) {
+          if (destination >= L[j]) {
+            cout << j + 1 << endl;
+            break;
+          } else {
+            // できるだけ左に移動する
+            chmin(current, L[j]);
+          }
+        }
+      }
+    }
   }
-  cout << ans << endl;
+
 
   return 0;
 }

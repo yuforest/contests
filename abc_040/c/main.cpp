@@ -60,24 +60,18 @@ int ans[2010];
 int N, M;
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N;
+  cin >> N;
+  ll a[N+1];
+  rep3(i, 1, N+1) cin >> a[i];
+  vl dp(N+1, 1e9);
+  dp[0] = 0;
+  dp[1] = 0;
+  dp[2] = abs(a[1] - a[2]);
+  rep3(i, 3, N+1) {
+    dp[i] = min(dp[i-2] + abs(a[i-2] - a[i]), dp[i-1] +  abs(a[i-1] - a[i]));
   }
-  cout << ans << endl;
-
+  debug(dp);
+  cout << dp[N] << endl;
   return 0;
 }

@@ -56,28 +56,23 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
-
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N;
+  cin >> N;
+  ll a[N];
+  set<ll> st;
+  rep(i, N) {
+    cin >> a[i];
+    st.insert(a[i]);
   }
-  cout << ans << endl;
+  map<ll, ll> mp;
+  ll index = 0;
+  for(auto x: st) {
+    mp[x] = index;
+    index++;
+  }
+  rep(i, N) {
+    cout << mp[a[i]] << endl;
+  }
 
-  return 0;
 }

@@ -56,35 +56,61 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+vector<ll>dx={1,-1,0,0,1,1,-1,-1};
+vector<ll>dy={0,0,1,-1,1,-1,1,-1};
 
 int main() {
-  ll N, L, R;
-  cin >> N >> L >> R;
-  ll A[N+1];
-  rep(i, N) {
-    cin >> A[i+1];
+  ll H, W;
+  cin >> H >> W;
+  string S[H];
+  rep(i, H) cin >> S[i];
+  vvc ans(H, vc(W, '.'));
+  rep(i, H) {
+    rep(j, W) {
+      bool all = true;
+      if (S[i][j] != '#') continue;
+      rep(k, 8) {
+        ll nx = i + dx[k];
+        ll ny = j + dy[k];
+        if (nx < 0 || nx > H-1) continue;
+        if (ny < 0 || ny > W-1) continue;
+        if (S[nx][ny] == '.') all = false;
+      }
+      if (all) ans[i][j] = '#';
+    }
   }
-  // dpxは右端からの変更、dpyは左端からの変更
-  ll dpx[N+1], dpy[N+1], ans;
-  dpx[0] = 0;
-  dpy[0] = 0;
+  debug(ans);
+  vvc check(H, vc(W, '.'));
+  rep(i, H) {
+    rep(j, W) {
+      if (ans[i][j] != '#') continue;
+      check[i][j] = '#';
+      rep(k, 8) {
+        ll nx = i + dx[k];
+        ll ny = j + dy[k];
+        if (nx < 0 || nx > H-1) continue;
+        if (ny < 0 || ny > W-1) continue;
+        check[nx][ny] = '#';
+      }
+    }
+  }
+  debug(check);
+  rep(i, H) {
+    rep(j, W) {
+      if (check[i][j] != S[i][j]) {
+        cout << "impossible" << endl;
+        return 0;
+      }
+    }
+  }
+  cout << "possible" << endl;
+  rep(i, H) {
+    rep(j, W) {
+      cout << ans[i][j];
+    }
+    cout << endl;
+  }
 
-  // 累積和的に左端から現在の場所までの最小値を導く
-  for(ll i=1; i<=N; i++){
-    // ここまでを変えた時に全てをLにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpx[i] = min(dpx[i-1] + A[i], i*L);
-	}
-  // 累積和的に右端から現在の場所までの最小値を導く
-	for(ll i=1; i<=N; i++) {
-     // ここまでを変えた時に全てをRにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpy[i] = min(dpy[i-1] + A[N-i+1], i*R);
-	}
-  // yが最高でNにした時の最小値
-  ans = dpx[0]+dpy[N];
-	for(ll i=1; i<=N; i++) {
-		ans = min(ans, dpx[i] + dpy[N-i]);
-	}
-	cout << ans << endl;
-
+  
   return 0;
 }

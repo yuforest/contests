@@ -56,28 +56,54 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
-
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N;
+  cin >> N;
+  vl a(N+1);
+  rep3(i, 1, N+1) cin >> a[i];
+  ll ans = -1000000;
+  rep3(i, 1, N+1) {
+    ll ao_max = -1000000;
+    ll ao_index = 0;
+    rep3(j, 1, N+1) {
+      if (i == j) continue;
+      ll taka = 0;
+      ll ao = 0;
+      ll first_index = i;
+      ll second_index = j;
+      if (first_index > second_index) swap(first_index, second_index);
+      ll index = 1;
+      rep3(k, first_index, second_index+1) {
+        if (index % 2 == 1) {
+          taka += a[k];
+        } else {
+          ao += a[k];
+        }
+        index++;
+      }
+      if (ao_max < ao) {
+        ao_max = ao;
+        ao_index = j;
+        debug(j);
+      }
+    }
+    ll first_index = i;
+    ll second_index = ao_index;
+    ll tmp = 0;
+    if (first_index > second_index) swap(first_index, second_index);
+    ll index = 1;
+    rep3(k, first_index, second_index+1) {
+      if (index % 2 == 1) {
+        debug(a[k]);
+        tmp += a[k];
+      }
+      index++;
+    }
+    debug(first_index);
+    debug(second_index);
+    debug(tmp);
+    chmax(ans, tmp);
   }
   cout << ans << endl;
-
   return 0;
 }

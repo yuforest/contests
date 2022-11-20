@@ -57,34 +57,46 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+string S;
+
+string accessory = "b";
+
+int ans = -1;
+
+void dfs(int count) {
+  if (count > 60) return;
+
+  if (count % 3 == 1) {
+    accessory += "c";
+    accessory = "a" + accessory;
+  } else if (count % 3 == 2) {
+    accessory += "a";
+    accessory = "c" + accessory;
+  } else {
+    accessory += "b";
+    accessory = "b" + accessory;
+  }
+  debug(accessory);
+  debug(S);
+  if (accessory == S) {
+    ans = count;
+    return;
+  }
+  dfs(count+1);
+}
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  // たかだか50番目くらいまで考えれば良い
+  int N;
+  cin >> N >> S;
+  if (S == "b") {
+    cout << 0 << endl;
+    return 0;
   }
+  dfs(1);
+
+  cout << ans << endl;
+
+
   return 0;
 }

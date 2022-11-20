@@ -57,65 +57,30 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
+int N, M, K, A[201010], B[201010];
+ll Atot[201010], Btot[201010];
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
+  cin >> N >> M >> K;
+  rep3(i, 0, N) cin >> A[i];
+  rep3(i, 0, M) cin >> B[i];
 
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
+  // 累積和配列作成
+  Atot[0] = 0;
+  rep3(i, 0, N) Atot[i + 1] = Atot[i] + A[i];
+  Btot[0] = 0;
+  rep3(i, 0, M) Btot[i + 1] = Btot[i] + B[i];
 
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
-    }
+  int ans = 0;
+  int ok = M;
+  // しゃくとり法、計算量O(N)
+  // aが増えるにしたがってbが小さくなっていくという単調性という性質
+  rep3(a, 0, N + 1) {
+    // okが0以上 && a番目までのAの本の和とBのok番目までの和がK以下になるまで
+    // okをデクリメント
+    while (0 <= ok && K < Atot[a] + Btot[ok]) ok--;
+    // okが0より大きければ最大値更新
+    if(0 <= ok) chmax(ans, a + ok);
   }
   cout << ans << endl;
   return 0;

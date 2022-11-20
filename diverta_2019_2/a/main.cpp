@@ -57,22 +57,15 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
 
 int main() {
-  int x[3], y[3];
-  map<int, int> x_mp;
-  map<int, int> y_mp;
-  rep(i, 3) {
-    cin >> x[i] >> y[i];
-    x_mp[x[i]]++;
-    y_mp[y[i]]++;
+  int N, K;
+  cin >> N >> K;
+  if (K == 1) {
+    cout << 0 << endl;
+    return 0;
   }
-  fore(x, x_mp) {
-    if (x.second == 1) cout << x.first << " ";
-  }
-  fore(x, y_mp) {
-    if (x.second == 1) cout << x.first << endl;
-  }
+  int remain = N - K;
+  cout << remain << endl;
   return 0;
 }

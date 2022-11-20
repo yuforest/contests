@@ -59,31 +59,22 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  int N;
+  string T;
+  cin >> N >> T;
+  int x = 0;
+  int y = 0;
+  vector<pair<int, int>> directions = {{1,0}, {0, -1}, {-1, 0}, {0, 1}};
+  int current = 0;
+  rep(i, N) {
+    if (T[i] == 'S') {
+      x += directions[current].first;
+      y += directions[current].second;
+    } else {
+      current += 1;
+      current %= 4;
+    }
   }
-  return 0;
+  cout << x << " " << y << endl;
+   return 0;
 }

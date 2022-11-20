@@ -57,66 +57,29 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
+  int N;
+  cin >> N;
+  vl dp(100007, 1000000);
+  dp[0] = 0;
+  rep(i, N) {
+    if (dp[i] == 1000000) continue;
+    // 9の累乗
+    rep3(j, 1, 6) {
+      ll num = pow(9, j);
+      if (i + num > N) continue;
+      chmin(dp[i+num], dp[i]+1);
     }
-  }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
+    // 6の累乗
+    rep3(j, 1, 7) {
+      ll num = pow(6, j);
+      if (i + num > N) continue;
+      chmin(dp[i+num], dp[i]+1);
     }
+    chmin(dp[i+1], dp[i]+1);
+    debug(dp[i]);
   }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
-      }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
-    }
-  }
-  cout << ans << endl;
+  cout << dp[N] << endl;
   return 0;
 }

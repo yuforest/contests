@@ -60,31 +60,33 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int R, C;
-  cin >> R >> C;
-  R--;
-  C--;
-  vector<string> mp = {
-    "bbbbbbbbbbbbbbb",
-    "bwwwwwwwwwwwwwb",
-    "bwbbbbbbbbbbbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwbwbwbwbwb",
-    "bwbwbwbbbwbwbwb",
-    "bwbwbwwwwwbwbwb",
-    "bwbwbbbbbbbwbwb",
-    "bwbwwwwwwwwwbwb",
-    "bwbbbbbbbbbbbwb",
-    "bwwwwwwwwwwwwwb",
-    "bbbbbbbbbbbbbbb",
-  };
-  if (mp[R][C] == 'b') {
-    cout << "black" << endl;
-  } else {
-    cout << "white" << endl;
+  string S;
+  cin >> S;
+  string min_string = S;
+  string max_string = S;
+  // 右シフトして最大のものを探す
+  rep(i, S.size()) {
+    string changed = "";
+    changed += S[S.size()-1];
+    changed += S.substr(0, S.size()-1);
+    S = changed;
+    chmin(min_string, S);
+    chmax(max_string, S);
   }
+  cout << min_string << endl;
+  cout << max_string << endl;
   return 0;
 }
+
+// こういうふうにも書ける
+// int main() {
+//   string s;
+//   cin >> s;
+//   int n = size(s);
+//   vector<string> v(n);
+//   for (int i = 0; i < n; ++i) {
+//       v[i] = s.substr(i, n - i) + s.substr(0, i);
+//   }
+//   cout << *min_element(begin(v), end(v)) << '\n';
+//   cout << *max_element(begin(v), end(v)) << '\n';
+// }

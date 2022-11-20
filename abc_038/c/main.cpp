@@ -60,22 +60,21 @@ int ans[2010];
 int N, M;
 
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll N;
+  cin >> N;
+  ll a[N];
+  rep(i, N) cin >> a[i];
+  int r = 0;
+  ll ans = 0;
+  for(int l = 0; l < N; l++) {
+    if (r < l) r++;
+    while(r < N-1 && a[r+1] > a[r]) {
+      r++;
+    }
+    debug(l);
+    debug(r);
+    debug(r - l + 1);
+    ans += r - l + 1;
   }
   cout << ans << endl;
 

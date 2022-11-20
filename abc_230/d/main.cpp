@@ -57,99 +57,34 @@ inline bool chmin(T &a, T b) {
 }
 
 
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+int main() {
+  using P = pair<ll, ll>;
+  ll N, D, L, R;
+  vector<P> LR;
+  cin >> N >> D;
+  for (int i = 0; i < N; i++) {
+    cin >> L >> R;
+    LR.emplace_back(L, R);
   }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
+  // Rに対して昇順にソートしていく
+  // これは終了時刻が早いものから選んでいくことで
+  // 後の選択肢を増やすという区間スケジューリング問題の考え方と
+  // 同じものである
+  sort(begin(LR), end(LR), [](P& a, P& b) { return a.second < b.second; });
+  // 最初にxを非常に小さい値で初期化しておく
+  // 順番に壁を見ていき、壁が破壊されていない場合は右端にパンチを放って破壊していく
+  ll ans = 0, x = -(1LL << 40);
+  // Rで昇順に並べている以上、次以降の壁をまとめて壊せる可能性を増やすためには
+  // 今の壁のRの位置にパンチを放つことが最適となる
+  // 最初の壁に対しても同じことが言えるのでRの位置にパンチを放ってその位置+D-1までに
+  // 次の壁があれば壊せたと判定していくのが最適解と言える
+  for (auto& [l, r] : LR) {
+    // 今いる地点からD−1だけ進んだ所までの壁を破壊することができている
+    // ので次の壁(今見ている壁)がそれ以上のところにあれば壁の右にパンチを放って破壊して
+    // 今いる位置を更新する
+    // 例えば今2の位置にいて、Dが3の時に4までパンチが届くが、lが5であればパンチは届かない
+    // のでもう一回パンチを放つ必要がある
+    if (x + D - 1 < l) ans++, x = r;
   }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
-  }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
-  return 0;
+  cout << ans << "\n";
 }
