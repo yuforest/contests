@@ -56,100 +56,45 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+// 最大の平方数をf(N)とおく
+// i*jが平方数となることはi*j/f(i)*f(j)が平方数となることと同値
+// つまりi,jから平方数を取り除いた後に掛けて平方数になれば良い
+// i/f(i)がある素数pで2回以上割り切れることはない
+// なぜならiを素因数分解したとき素数項の指数が奇数の場合、指数の偶数部分はf(i)で割ることでなくなるので
+// 残る素数は0個か1個になる
+// つまりi/f(i)とj/f(j)は同じものである必要がある
+// そうでないと掛けても平方数にならない
+// そこでi/f(i)の数を1からNまでカウントして、
+// そのカウントの2乗和を取れば答えになる
+int main() {
+  int n;
+  cin>>n;
+  vector<bool> sq(n+1,false);
+  // N以下の平方数を求める
+  for(int i=1;i*i<=n;i++) sq[i*i] = true;
+  // 二次元配列
+  vector<vector<int>> d(n+1);
+  // 1からNまでの数に対して操作を行う
+  // ここの計算量は調和級数的になる、O(NlogN)、N+N/2+N/3+...1
+  for(int i=1;i<=n;i++){
+    // iの倍数となる数の配列にiをpushしていく
+    // 約数列挙をしている、d[j]にはiをpushしているので約数が昇順に並ぶことになる
+    for(int j=i;j<=n;j+=i) d[j].push_back(i);
   }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
+  vector<int> cnt(n+1);
+  for(int i=1;i<=n;i++){
+    int f=0;
+    // 約数を全探索
+    // その約数が平方数であればfを更新
+    // つまりiの約数の内最大の平方数を探索している
+    for(int j=0;j<d[i].size();j++) if(sq[d[i][j]]) f=d[i][j];
+    // iから平方数を取り除いた後に残る数字の数をカウントしている
+    cnt[i/f]++;
   }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
+  int ans=0;
+  for(int i=1;i<=n;i++) {
+    debug(cnt[i]);
+    ans+=cnt[i]*cnt[i];
   }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
-  return 0;
+  cout<<ans<<endl;
 }

@@ -57,28 +57,60 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
-int N, x[101], y[101], h[101];
-
 int main() {
-  cin >> N;
-  rep3(i, 0, N) cin >> x[i] >> y[i] >> h[i];
-  // ピラミッドの中心座標を全探索
-  rep3(cx, 0, 101) rep3(cy, 0, 101) {
-    // 高度を見ると、「H-中心とのマンハッタン距離」になっているので、
-    // 逆に中心は「h[i]+中心とのマンハッタン距離」の高さになっている
-    // h[i]=0になっているものは距離が分からないので、中心の高さを求めるのには使わない
-    int H = 1;
-    // ループしているがh[i]が0でないものなら一つだけわかれば良い
-    rep3(i, 0, N) if (h[i]) H = h[i] + abs(cx - x[i]) + abs(cy - y[i]);
-    // 全ての頂点に対してチェック
-    int ok = 1;
-    rep3(i, 0, N) if (max(H - abs(x[i] - cx) - abs(y[i] - cy), 0) != h[i]) ok = 0;
-    if (ok) {
-      printf("%d %d %d\n", cx, cy, H);
-      return 0;
+  string S;
+  cin >> S;
+  ll N = S.size();
+  set<ll> st;
+  rep3(i, 2, N-2) {
+    if (S[i] == S[i+1]) {
+      st.insert(i);
     }
   }
+  debug(st);
+  ll ans = 0;
+  // 前2つの文字列が同じなら変更する
+  rep3(i, 0, N-2) {
+    // 切り替わるタイミングならスキップ
+    if (st.find(i+1) != st.end() || st.find(i+2) != st.end()) continue;
+    if (S[i] == S[i+1] && S[i+2] != S[i]) {
+      S[i+2] = S[i];
+      ans++;
+    }
+  }
+  debug(S);
+  debug(ans);
+  vl elements;
+  elements.push_back(0);
+  ll tmp = 0;
+  char current = '-';
+  // 変更後の要素数をカウント
+  for(int i = N-1; i >= 0; i--) {
+    if (current != S[i]) {
+      current = S[i];
+      if (tmp > 1) {
+        elements.push_back(tmp);
+      }
+      tmp = 1;
+    } else {
+      tmp++;
+    }
+  }
+  if (tmp > 1) {
+    elements.push_back(tmp);
+  }
+  debug(elements);
+  // 累積和を作る
+  rep3(i, 1, elements.size()) {
+    elements[i] += elements[i-1];
+  }
+  debug(elements);
+  rep(i, elements.size()-1) {
+    ans += elements[i];
+  }
+  cout << ans << endl;
+
   return 0;
 }
+
+// aaerrorrccurred

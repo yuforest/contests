@@ -56,28 +56,39 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
-
 int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+  ll n,k;
+  cin>>n>>k;
+  vector<ll> s(n);
+  for(int i=0;i<n;i++){
+    cin>>s[i];
   }
-  cout << ans << endl;
-
+  rep(i, n) {
+     // 一つでも0があれば全ての列を使える(Kは0以上)
+    if(s[i]==0){
+      cout<<n<<endl;
+      return 0;
+    }
+  }
+  int end=0,ans=0,cnt=0;
+  ll sum=1;
+  // しゃくとり法を用いて実装する
+  for(int i=0;i<n;i++){
+    // 右側を追加
+    sum*=s[i];
+    cnt++;
+    // 現在の積がkより大きい時、左側を除いていく
+    // その結果積がk以下になるまで、要素があれば除いていく処理
+    while(sum>k&&cnt>0){
+      sum/=s[end];
+      // 左側を進める
+      end++;
+      // カウントを減らす
+      cnt--;
+    }
+    // 最大値更新
+    ans=max(ans,cnt);
+  }
+  cout<<ans<<endl;
   return 0;
 }

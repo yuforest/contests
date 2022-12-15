@@ -60,32 +60,43 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+int N;
+string S;
+vector<string> T;
+vector<int> memo;
+// メモ化再帰(動的計画法)
+// i文字目までのフレーズの並べ方の通り数を計算する
+int f(int i){
+  // iが0より小さくなってしまった場合は実現不可能なので0通り
+  if(i < 0)return 0;
+  // 先頭から0文字までの並べ方の通り数は1通り
+  if(i == 0)return 1;
+  // 既に結果が保存されていたらそれを返す
+  if(memo[i] != -1)return memo[i];
+  // 合計の通り数
+  int ret = 0;
+  // フレーズの配列の中身を見ていく
+  for(const string& t : T) {
+    // i文字目までの最後のフレーズの長さ分の文字列がtと一致していたらそれ以前に関して
+    // 再帰関数を呼び出して通り数を求める
+    // つまり文字列を最後から見ていって、通り数を求めていく
+    if(i >= t.length() && S.compare(i - t.length(), t.length(), t) == 0) {
+      ret = (ret + f(i - t.length())) % 1000000007;
+    }
+  }
+  // メモに保存して値を返す
+  return memo[i] = ret;
+}
 
-int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
-    }
-  }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
-  }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
+int main(){
+  cin >> N;
+  cin >> S;
+  T.resize(N);
+  for(int i=0; i<N; ++i)cin >> T[i];
+
+  // -1で初期化
+  memo = vector<int>(S.length() + 1, -1);
+  cout << f(S.length()) << endl;
+  debug(memo);
   return 0;
 }

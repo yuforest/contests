@@ -38,7 +38,8 @@ using namespace atcoder;
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
 #define all(x) (x).begin(), (x).end()
-#define rrep(i,a,b) for(int i=a;i>=b;i--)
+#define per(i, b) per2(i, 0, b)
+#define per3(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
 
 // 無くても困らない
 #define INFTY (1 << 30)

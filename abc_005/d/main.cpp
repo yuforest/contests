@@ -57,100 +57,57 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
-  }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
+const int MAXN = 55;
+int v[MAXN][MAXN], sum[MAXN][MAXN];
+int dp[MAXN*MAXN];
 
 int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
+  int N;
+  cin >> N;
+  // 入力を受け取る
+  vector<vector<int>> v(N, vector<int>(N));
+  rep(i, N) rep(j, N) cin >> v[i][j];
+
+  // 二次元累積和の計算
+  rep3(i, 1, N + 1) rep3(j, 1, N + 1) {
+    // 今の値に縦の1つ前の累積和と横の1つ前の累積和を足して、横縦共に1つ前の累積和を引く
+    sum[i][j] = v[i - 1][j - 1] + sum[i - 1][j] + sum[i][j - 1] - sum[i - 1][j - 1];
+  }
+  // 下記のようなものができる
+  // 元の配列
+  // 3 2 1
+  // 2 2 1
+  // 1 1 1
+  // 累積和
+  // 3 5 6
+  // 5 9 11
+  // 6 11 14
+
+  debug(sum);
+
+  // dp配列に焼ける = 長方形の大きさに対する美味しさの合計の最大値を保存しておく
+  // O(N^4)=6250000
+  // 右下の位置と左上の位置を全探索i,jが右下、k,lが左上の一つ前(範囲に含まない)
+  rep3(i, 1, N + 1) rep3(j, 1, N + 1) rep3(k, 0, i) rep3(l, 0, j){
+    // 指定された長方形に対する美味しさの合計を返す
+    int s = sum[i][j] - sum[i][l] - sum[k][j] + sum[k][l];
+    // 最大値を更新
+    // (i - k)*(j - l)で長方形の大きさを計算できる
+    dp[(i - k)*(j - l)] = max(dp[(i - k)*(j - l)], s);
   }
 
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
+  // 上限が小さくても最大値が大きいものがあれば、大きいものを更新していく
+  rep(i, MAXN*MAXN - 1) dp[i + 1] = max(dp[i + 1], dp[i]);
 
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
+  int Q;
+  cin >> Q;
+  while (Q--){
+    int p;
+    cin >> p;
+    // 前計算してあるので答えをO(1)で取得可能
+    cout << dp[p] << endl;
   }
-  cout << res << "\n";
+
+
   return 0;
 }

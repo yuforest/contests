@@ -57,34 +57,111 @@ inline bool chmin(T &a, T b) {
 }
 
 
-int main() {
-  ll N, L, R;
-  cin >> N >> L >> R;
-  ll A[N+1];
-  rep(i, N) {
-    cin >> A[i+1];
+const int MAXN = 100100;
+int A[MAXN];
+
+struct edge {
+  int v;
+  ll w;
+  edge() {}
+  // コンストラクタで頂点と辺の重みを保存
+  edge(int v, ll w) : v(v), w(w) {};
+};
+
+// ダイクストラによって頂点数、グラフ、スタートの頂点を受け取り
+// 単一始点からの各頂点への最短距離の配列を返す
+// 計算量はO(MlogN)
+// priority_queueを使うことで候補の追加や最小値の取得をO(logN)で行うことができる
+// priority_queueの中で最短距離順に並べるところで合計N個の頂点を並び替えることになるので
+// 計算量O(logN)となる
+vector<ll> dijkstra(int n, vector<vector<edge> >& G, int s) {
+  // 距離は最初大きな値で初期化しておく
+  vector<ll> d(n, LLONG_MAX/10);
+  // スタート地点の距離は0
+  d[s] = 0;
+  // スタートからある頂点への距離と頂点名をqueueに入れていく
+  // priority_queueなので、常にスタート地点からの距離が近い頂点から探索してくれる
+  // 例えば
+  // 0,1,2,3の頂点があり
+  // 0->1,dist:1
+  // 0->2,dist:3
+  // 1->3,dist:1
+  // 2->3,dist:1
+  // のような辺があったとする
+  // このときまず0を探索して、{1,1}と{3,2}がpriority_queueに追加される
+  // (便宜上priority_queueは昇順で値と取り出すとする)
+  // 次に探索されるのは{1,1}でこのときpriority_queueに{2,3}が追加される(ここで1への最短距離は1)
+  // 次に探索されるのは{2,3}でこのときpriority_queueには何も追加されない(ここで3への最短距離は2)
+  // 最後に探索されるのは{3,2}でこのときpriority_queueには何も追加されない(ここで2への最短距離は3)
+  // このように常に始点から距離が近い頂点を探索し、現在の最短距離よりも大きい頂点からは
+  // 探索をしない(打ち切る)ことができるので効率的に最短距離を確定させていくことができる
+  priority_queue<pair<ll, int> > que;
+  // 最初の頂点から最初の頂点への距離は0, スタート地点から探索を始める
+  que.push(make_pair(0ll, s));
+  // 探索するべき頂点がなくなるまでやる
+  while (!que.empty()) {
+    auto p = que.top();
+    que.pop();
+    int u = p.second;
+    // 入れる時につけたマイナスを外す
+    ll dist = -p.first;
+    // 距離が今の頂点への距離より大きければ、
+    // それより先でも距離が短くなることはないので探索を打ち切る
+    if (dist > d[u]) continue;
+    // 探索頂点に繋がっている頂点を探索
+    for (edge e : G[u]) {
+      // 次に探索する頂点の現在のスタートからの最短距離より、
+      // スタートから今の頂点に来て、そこから次の頂点に移動する方が近ければ
+      if (d[e.v] > d[u]+e.w) {
+        // 距離を更新する
+        d[e.v] = d[u] + e.w;
+        // 次にこの頂点を探索したいのでqueにpushする
+        // priority_queueはデフォルト降順なので
+        // 昇順にするためにマイナスにする
+        // ex: デフォルトで距離が2,1の順で取り出されてしまうが、
+        // 1,2の順に見ていきたいので-1, -2とすることで降順で-1から取り出せる
+        que.push(make_pair(-d[e.v], e.v));
+      }
+    }
   }
-  // dpxは右端からの変更、dpyは左端からの変更
-  ll dpx[N+1], dpy[N+1], ans;
-  dpx[0] = 0;
-  dpy[0] = 0;
+  return d;
+}
 
-  // 累積和的に左端から現在の場所までの最小値を導く
-  for(ll i=1; i<=N; i++){
-    // ここまでを変えた時に全てをLにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpx[i] = min(dpx[i-1] + A[i], i*L);
-	}
-  // 累積和的に右端から現在の場所までの最小値を導く
-	for(ll i=1; i<=N; i++) {
-     // ここまでを変えた時に全てをRにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpy[i] = min(dpy[i-1] + A[N-i+1], i*R);
-	}
-  // yが最高でNにした時の最小値
-  ans = dpx[0]+dpy[N];
-	for(ll i=1; i<=N; i++) {
-		ans = min(ans, dpx[i] + dpy[N-i]);
-	}
-	cout << ans << endl;
 
+// この問題は1つの街に行き、その街にできるだけ長く滞在し、
+// 帰ってきたときの値が最大の所持金となる
+// 複数の街に滞在することにより所持金がより大きくなるということはあり得ない
+int main() {
+  cin.tie(0);
+  ios::sync_with_stdio(false);
+  int N, M, T;
+  cin >> N >> M >> T;
+  // 普通のグラフと辺の向きを逆にしたグラフの構築
+  // 頂点ごとに向かう頂点とその重みを保存する
+  vector<vector<edge>> G(N), rG(N);
+  for (int i = 0; i < N; i++) cin >> A[i];
+  for (int i = 0; i < M; i++) {
+    int a, b, c;
+    cin >> a >> b >> c;
+    a--; b--;
+    // コンストラクタ引数をemplace_backの引数として末尾に新たな要素を追加することができる
+    G[a].emplace_back(b, c);
+    rG[b].emplace_back(a, c);
+  }
+  // 通常の最初の街からの各街への最短距離
+  auto d = dijkstra(N, G, 0);
+  // 各街から頂点1への最短距離を調べる代わりに辺の向きを逆にして頂点1から各街への最短距離を調べる
+  // 始点が複数あるとその分だけダイクストラを行う必要があり、計算量がO(NMlogN)とかになってしまう
+  auto rd = dijkstra(N, rG, 0);
+  ll ans = 0;
+  for (int i = 0; i < N; i++) {
+    // 行きと帰りの最短距離を足した値が往復の最短距離
+    ll need = d[i]+rd[i];
+    // この時点で制限時間超過したらcontinue
+    if (need > T) continue;
+    // 最大値更新
+    ans = max(ans, (T-need) * A[i]);
+  }
+  cout << ans << endl;
   return 0;
 }

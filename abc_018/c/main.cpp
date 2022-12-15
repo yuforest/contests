@@ -61,60 +61,39 @@ int ans[2010];
 int N, M;
 
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
-  }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
+  int R, C, K;
+  cin >> R >> C >> K;
+  bool isBlocked[500][500] = {{ false }};
+  for (int i = 0; i < R; i++){
+    string s;
+    cin >> s;
+    for (int j = 0; j < C; j++){
+      // 黒いマスであれば
+      // xを中心として中心からの距離がK-1以下の菱形の部分は使えないようにする
+      // その距離の範囲内にあるところから菱形と作ろうとしても失敗する
+      if (s.at(j) == 'x'){
+        // xとyの取りうる範囲を探索
+        // 長方形領域を探索して条件部分で絞っている
+        // xからの距離がK−1以内のマスを探索
+        for (int x = i - (K - 1); x <= i + (K - 1); x++){
+          for (int y = j - (K - 1); y <= j + (K - 1); y++) {
+            // x,yが長方形領域の範囲で、|i-x|+|j-y|<= K-1を満たしている場合ブロックする
+            if (x >= 0 && x < R && y >= 0 && y < C && abs(x - i) + abs(y - j) <= K - 1) isBlocked[x][y] = true;
           }
         }
-        debug("---");
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
+    }
+  }
+
+  int ans = 0;
+  // x(K<=x<=R-K+1), y(K<=y<=C-K+1)を満たすx,yに対してブロックされていないところを数える
+  for (int i = K - 1; i < R - K + 1; i++){
+    for (int j = K - 1; j < C - K + 1; j++){
+      if (!isBlocked[i][j]) {
+        debug(i);
+        debug(j);
+        ans++;
       }
-      debug("\n");
     }
   }
   cout << ans << endl;

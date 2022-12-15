@@ -56,28 +56,84 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
+// int main(){
+//   long long n;
+//   cin >> n;
+//   // nより大きくなるということ
+//   n += 1;
+//   bool win = true;
+//   while(n > 1){
+//     debug(n);
+//     debug(win);
+//     // Takahashiは自分のターンで1になってしまったら負け
+//     // 毎回winは切り替わるので、Takahashiは自分のターンでは常に
+//     // 左に行こうとする
+//     // n+1から見ると減らない方向に行こうとする
+//     if(win){
+//       n = (n+1)/2;
+//     } else{
+//       // 同様にAokiは常に右に行こうとする
+//       // n+1から見ると減る方向に行こうとする
+//       n = n/2;
+//     }
+//     // 勝ち負けを切り替える
+//     // 例えば1回の操作で上限を超えてしまう場合はTakahashiが負ける
+//     win = !win;
+//   }
 
-int main() {
-  ll X, A, D, N;
-  cin >> X >> A >> D >> N;
-  ll first = A;
-  ll last = A + D * (N-1);
-  ll bigger = max(first, last);
-  ll smaller = min(first, last);
-  debug(bigger);
-  debug(smaller);
-  ll ans;
-  if (X <= smaller) {
-    ans = smaller - X;
-  } else if (bigger <= X) {
-    ans = X - bigger;
-  } else {
-    ll diff = (bigger - X) % abs(D);
-    ans = min(diff, abs(D) - diff);
+//   if(win){
+//     cout << "Takahashi" << endl;
+//   }else{
+//     cout << "Aoki" << endl;
+//   }
+
+//   return 0;
+// }
+
+
+
+int main(){
+  ll N;
+  cin >> N;
+  // 深さ
+  ll depth = 0;
+  // 高橋のターンから
+  int turn = 1;
+  // 今の値
+  ll x = 1;
+  // 例えばn=10の時深さ4
+  for (ll n = N; n > 0; n /= 2) depth++;
+  debug(depth);
+  // シミュレーション
+  // 境界線を跨ぐと負けてしまうので自分が負けない方向に行こうとする
+  // その方向はNの深さによって変わる
+  while (true){
+    // Nを超えた時点で抜ける
+    if (x > N) break;
+    // 深さが偶数かどうかにより戦略が逆になる
+    if (depth % 2){
+      // 偶数なら高橋は右に行く戦略
+      // 青木は左に行く戦略
+      if (turn == 1) {
+        x = x * 2 + 1;
+      } else{
+        x = x * 2;
+      }
+    } else{
+      // 奇数なら高橋は左に行く戦略
+      // 青木は右に行く戦略
+      if (turn == 1){
+        x = x * 2;
+      } else{
+        x = x * 2 + 1;
+      }
+    }
+    // ターン切り替え
+    turn *= -1;
   }
-  cout << ans << endl;
 
+  // Nを超えた時に最後に操作していた人が負ける
+  if (turn == 1) cout << "Takahashi" << endl;
+  else cout << "Aoki" << endl;
   return 0;
 }

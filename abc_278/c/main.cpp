@@ -39,6 +39,8 @@ using namespace atcoder;
 #define rep3(i,a,b) for(int i=a;i<b;i++)
 #define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
+#define per(i, b) per2(i, 0, b)
+#define per3(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
 
 // 無くても困らない
 #define INFTY (1 << 30)

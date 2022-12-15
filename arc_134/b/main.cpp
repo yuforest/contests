@@ -37,6 +37,8 @@ using namespace atcoder;
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
+#define per(i, b) per2(i, 0, b)
+#define per2(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
 #define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
@@ -59,23 +61,50 @@ inline bool chmin(T &a, T b) {
 
 
 int main() {
-  int A, B, C;
-  cin >> A >> B >> C;
+  int N;
+  string s;
+  cin >> N >> s;
 
-  // 整数 A,i に対し、Aiの 10 進法での 1 の位は i に関して周期 4 を持つ
-  // 2->4->8->6->2
-  // 3->9->7->1->3
-  // すなわち、B^Cの代わりにそれを4で割った余り（ただし余り0は4とみなす）を使って
-  // A^B^Cを計算する
+  vector<int> cnt(26);
+  // 文字の出現回数をカウント
+  for (auto c : s) {
+      cnt[c - 'a']++;
+  }
+  // rを最後のインデックスに初期化
+  int r = N - 1;
 
-  // pow_modの計算量はO(logn)、ここではlogC
-  int bc = pow_mod(B, C, 4);
-  // 0乗だと1になってしまうため、4乗する
-  if( bc == 0 ) bc = 4;
-  // A^bcをmod10して1の桁を求めている
-  int ans = pow_mod( A, bc, 10 );
-
-  cout << ans << endl;
-
+  // 貪欲法で解くことができる
+  // 左側から探索していく
+  rep(i, N) {
+    // iがr以上になったらループを抜ける
+    if (i >= r) break;
+    // 現在のアルファベット
+    int x = s[i] - 'a';
+    // 適当な値で初期化
+    int mn = 30;
+    // 25からデクリメントしていき、値が存在する最も小さい値を探す
+    per(c, 26) if (cnt[c]) { mn = c; }
+    // 最小の値と現在の値が等しければ、
+    // カウントから除いて次のループに移動
+    // 今のxの値はもう探索範囲に含まれなくなるため
+    if (mn == x) {
+      cnt[x]--;
+      continue;
+    }
+    // 異なる場合その最小値が見つかるまで、
+    // 途中の値をカウントから除きながら移動する
+    while (s[r] - 'a' != mn) {
+      cnt[s[r] - 'a']--;
+      r--;
+    }
+    // 見つけた最小値と現在の値を交換する
+    swap(s[i], s[r]);
+    // 現在の値と最小の値をカウントから除く
+    cnt[x]--;
+    cnt[mn]--;
+    // 右側の探索位置を1つ左に移動する
+    r--;
+  }
+  cout << s << endl;
   return 0;
 }

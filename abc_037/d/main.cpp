@@ -57,34 +57,47 @@ inline bool chmin(T &a, T b) {
 }
 
 
-int main() {
-  ll N, L, R;
-  cin >> N >> L >> R;
-  ll A[N+1];
-  rep(i, N) {
-    cin >> A[i+1];
+int h,w;
+int a[1252][1252];
+ll dp[1252][1252];
+// 4方向を探索するための配列、インデックスを0~3まで動かしてi,i+1を見ていけば良い
+int d[] = {1,0,-1,0,1};
+
+// メモ化再帰
+ll dfs(ll y,ll x){
+  // -1でなければ答えが既に入っているので結果を返す
+  if(dp[y][x]!=-1)return dp[y][x];
+  // 現在のマスだけの経路で1通り
+  ll cur = 1;
+  // 4方向を深さ優先探索で再帰的に探索
+  rep(i,4){
+    // 0の時ny=y+1,nx=x,下
+    // 1の時ny=y,nx=x-1,左
+    // 2の時ny=y-1,nx=x,上
+    // 3の時ny=y,nx=x+1,右となる
+    int ny = y+d[i], nx = x+d[i+1];
+    // nx,nyがグリッドの範囲外であれば探索しない
+    if(ny<0 || nx<0 || ny>=h || nx>=w)continue;
+    // 次が現在の値よりも大きくなければ探索しない
+    if(a[y][x]>=a[ny][nx])continue;
+    cur += dfs(ny,nx);
   }
-  // dpxは右端からの変更、dpyは左端からの変更
-  ll dpx[N+1], dpy[N+1], ans;
-  dpx[0] = 0;
-  dpy[0] = 0;
+  // 答えを保存しつつ、返す
+  return dp[y][x] = cur%mod;
+}
 
-  // 累積和的に左端から現在の場所までの最小値を導く
-  for(ll i=1; i<=N; i++){
-    // ここまでを変えた時に全てをLにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpx[i] = min(dpx[i-1] + A[i], i*L);
-	}
-  // 累積和的に右端から現在の場所までの最小値を導く
-	for(ll i=1; i<=N; i++) {
-     // ここまでを変えた時に全てをRにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpy[i] = min(dpy[i-1] + A[N-i+1], i*R);
-	}
-  // yが最高でNにした時の最小値
-  ans = dpx[0]+dpy[N];
-	for(ll i=1; i<=N; i++) {
-		ans = min(ans, dpx[i] + dpy[N-i]);
-	}
-	cout << ans << endl;
-
+int main(){
+  scanf("%d%d",&h,&w);
+  // 入力を受け取る
+  rep(i,h)rep(j,w)scanf("%d",&(a[i][j]));
+  // -1で初期化
+  rep(i,h)rep(j,w)dp[i][j] = -1;
+  ll ans = 0;
+  // 全てのマスの経路数を最終的な答えに足してmodを取る
+  rep(i,h) rep(j,w){
+    ans += dfs(i,j);
+    ans %= mod;
+  }
+  cout << ans << endl;
   return 0;
 }

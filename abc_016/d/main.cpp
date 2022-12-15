@@ -57,100 +57,64 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+typedef struct Point_Coordinates {
+    double x, y;
+} point;
 
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
+// 直線ABの傾きはyA-yB/xA-xB
+// 直線ABの方程式はy-yA=(yA-yB/xA-xB)(x-xA)
+// 式変形して(xA-xB)(y-yA)-(yA-yB)(x-xA) = 0
+// よってC,Dとの領域判定を行う場合
+// 上の式に(xC,yC)と(xD,yD)を代入する
+// これがプラスになるということは直線よりも点が上に位置することを意味する
+// これがマイナスになるということは直線よりも点が下に位置することを意味する
+// s=(xA-xB)(yC-yA)-(yA-yB)(xC-xA)
+// t=(xA-xB)(yD-yA)-(yA-yB)(xD-xA)
+// とおくとst<0の時点C,Dは直線ABに対して別の領域に存在すると言える
 
-//   map<string,int> mp;
-//   queue<string> q;
+// 線分の交差判定
+// 直線ABに対する点C,Dの位置と
+// 直線CDに対する点A,Bの位置を両方チェックすることで
+// 線分の交差判定をすることができる
+// 線分ab, cdが交差する場合True
+// 端点が他方の線分上にある場合もTrue
+// 端点が他方の線分の延長線上にある場合もTrueを返すので注意
+bool Judge(point &a, point &b, point &c, point &d) {
+  double s, t;
+  // 直線ABに対して点C,Dがどちらにあるかチェックしている
+  s = (a.x - b.x) * (c.y - a.y) - (a.y - b.y) * (c.x - a.x);
+  t = (a.x - b.x) * (d.y - a.y) - (a.y - b.y) * (d.x - a.x);
+  // この時同じ側に存在するので交差しない
+  if (s * t > 0)
+      return false;
 
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
-  }
-  return s;
+  // 直線CDに対して点A,Bがどちらにあるかチェックしている
+  s = (c.x - d.x) * (a.y - c.y) - (c.y - d.y) * (a.x - c.x);
+  t = (c.x - d.x) * (b.y - c.y) - (c.y - d.y) * (b.x - c.x);
+  // このとき同じ側に存在するので交差しない
+  if (s * t > 0)
+      return false;
+  return true;
 }
 
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
+// 100C2=50*99=4950
 int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
+  point A, B;
+  cin >> A.x >> A.y >> B.x >> B.y;
+  ll N;
+  cin >> N;
+  vector<point> points(N);
+  rep(i, N) {
+    cin >> points[i].x >> points[i].y;
   }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
+  ll cross = 0;
+  rep(i, N) {
+    if (i != N-1) {
+      if (Judge(A, B, points[i], points[i+1])) cross++;
+    } else {
+      if (Judge(A, B, points[i], points[0])) cross++;
+    }
   }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
-  return 0;
+  debug(cross);
+  cout << cross/2+1 << endl;
 }

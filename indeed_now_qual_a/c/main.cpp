@@ -62,72 +62,71 @@ inline bool chmin(T &a, T b) {
 }
 const ll INF = ll(1e18);
 
-// ll N_size;
-// string bi_N = "";
-// set<ll> ans;
-// ll N;
+ll N, Q;
+vl s;
 
-// bool used[61];
-// void dfs(ll current, ll digit) {
-//   if (bi_N[digit] == '1') {
-//     debug(digit);
-//     ll tmp = current + powl(2, digit);
-//     if (tmp <= N) ans.insert(tmp);
-//     if (digit+1 < N_size) {
-//       dfs(tmp, digit+1);
-//     }
-//   }
-//   if (current <= N) ans.insert(current);
-//   if (digit+1 < N_size) {
-//     dfs(current, digit+1);
-//   }
+// 二分探索でも解ける
+// bool ok(ll point, ll limit) {
+//   auto index = lower_bound(s.begin(), s.end(), point) - s.begin();
+//   debug(s.size() - index);
+//   debug(limit);
+//   debug(point);
+//   return (s.size() - index <= limit);
 // }
 
 // int main() {
 //   cin >> N;
-
-//   ll tmp_N = N;
-//   while(tmp_N > 0) {
-//     bi_N += to_string(tmp_N % 2);
-//     tmp_N /= 2;
+//   rep(i, N) {
+//     ll val;
+//     cin >> val;
+//     if (val != 0) s.push_back(val);
 //   }
-//   debug(bi_N);
-//   N_size = bi_N.size();
-//   debug(N_size);
-//   dfs(0, 0);
+//   sort(s.begin(), s.end());
 
-
-//   fore(x, ans) {
-//     cout << x << endl;
+//   debug(s);
+//   cin >> Q;
+//   vl k(Q);
+//   rep(i, Q) {
+//     cin >> k[i];
+//     ll l = -1, r = 1000002;
+//     while(r-l != 1) {
+//       ll mid = (l + r) / 2;
+//       if (ok(mid, k[i])) r = mid;
+//       else l = mid;
+//     }
+//     debug(l);
+//     debug(r);
+//     cout << r << endl;
 //   }
-//   return 0;
 // }
 
-
-// bit全探索でも解ける
-int main() {
-  ll N;
-  cin >> N;
-  vl digits;
-  rep(i, 61){
-    if (N & (1LL << i)) {
-      digits.push_back(i);
+// 二分探索でなくても解ける
+bool solve(){
+  int n;
+  cin >> n;
+  vector<int> score(n);
+  rep(i, n) cin >> score[i];
+  sort(score.begin(), score.end(), greater<int>());
+  while(size(score) and score.back() == 0) score.pop_back();
+  int q;
+  cin >> q;
+  rep(_, q){
+    int k;
+    cin >> k;
+    // k人を合格にする最小のボーダー
+    if(k < score.size()){
+      // 配列の0~k-1番目までの人を合格にしたので
+      // k番目の人は受からない
+      // よってscore[k]+1を出力すれば良い
+      cout << score[k]+1 << endl;
+    }else{
+      // 全員合格になる時はボーダーは0点で良い
+      cout << 0 << endl;
     }
   }
-  debug(digits);
-  int K = digits.size();
-  vl ans;
-  rep(msk, (1LL << K)) {
-    ll tmp = 0;
-    rep(i, K) {
-      if (msk & (1LL << i)) {
-        // tmp += (1LL << digits[i]);
-        tmp += powl(2, digits[i]);
-      }
-    }
-    ans.push_back(tmp);
-  }
-  rep(i, ans.size()) {
-    cout << ans[i] << endl;
-  }
+  return true;
+}
+signed main(){
+  solve();
+  return 0;
 }

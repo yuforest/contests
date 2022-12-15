@@ -57,28 +57,57 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
-int N, x[101], y[101], h[101];
-
 int main() {
+  int N;
   cin >> N;
-  rep3(i, 0, N) cin >> x[i] >> y[i] >> h[i];
-  // ピラミッドの中心座標を全探索
-  rep3(cx, 0, 101) rep3(cy, 0, 101) {
-    // 高度を見ると、「H-中心とのマンハッタン距離」になっているので、
-    // 逆に中心は「h[i]+中心とのマンハッタン距離」の高さになっている
-    // h[i]=0になっているものは距離が分からないので、中心の高さを求めるのには使わない
-    int H = 1;
-    // ループしているがh[i]が0でないものなら一つだけわかれば良い
-    rep3(i, 0, N) if (h[i]) H = h[i] + abs(cx - x[i]) + abs(cy - y[i]);
-    // 全ての頂点に対してチェック
-    int ok = 1;
-    rep3(i, 0, N) if (max(H - abs(x[i] - cx) - abs(y[i] - cy), 0) != h[i]) ok = 0;
-    if (ok) {
-      printf("%d %d %d\n", cx, cy, H);
-      return 0;
+  vector<int> P(N), pos(N), ans;
+  rep(i, N) cin >> P[i];
+  // 0-indexedに
+  rep(i, N) P[i]--;
+  // 現在のiがどの位置にあるかを記録
+  rep(i, N) pos[P[i]] = i;
+  debug(pos);
+
+  set<int> st;
+  // 0からN-1まで探索
+  // Pi=1となるiについて真っ先に
+  // P[i-1]とP[i]を入れ替える->P[i-2]とP[i-1]を入れ替える->...->P[1]とP[2]を入れ替える
+  // という操作をしなければ最終的にP[1]=1とすることができない
+  // この操作を行ったあと、 P1​,P2,…Pi−1の値はその時点で確定する
+  // よってこの中に Pj!=j なる j があれば、答えは -1
+  // Pi以降の部分にも同様の議論を適用していけばよい
+  // 計算量O(N)
+  rep(i, N) {
+    // 既に同じ場合はcontinue
+    if(pos[i] == i) continue;
+    // iのある位置がiより小さければその時点でbreak
+    // この時は操作によって昇順にすることができない
+    if(pos[i] < i) break;
+    // iの位置がiと同じになるまで操作を行う
+    while(pos[i] != i) {
+      // 既にiの一つ前の要素との交換が行われている場合はbreak
+      if(st.count(pos[i] - 1)) break;
+      // iの一つ前にある要素を取得
+      int prev = P[pos[i] - 1];
+      // iと一つ前の要素の交換を記録
+      st.insert(pos[i] - 1);
+      // 操作を答えのvectorに記録、1-indexedにしている
+      ans.push_back(pos[i] - 1 + 1);
+      // iとその一つ前の要素を交換
+      swap(P[pos[prev]], P[pos[i]]);
+      // ポジションを記録する配列の方も交換
+      swap(pos[prev], pos[i]);
     }
   }
+
+  bool sorted = true;
+  // i == P[i]にソートされていなければ実現不可能
+  rep(i, N) if(P[i] != i) sorted = false;
+  // N-1回の操作を行なっていない場合実現不可
+  if((int)st.size() != N - 1) sorted = false;
+  // ソートされているかどうかによって答えを出し分ける
+  if(!sorted) cout << -1 << endl;
+  else rep(i, N - 1) cout << ans[i] << endl;
+
   return 0;
 }

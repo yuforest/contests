@@ -60,62 +60,54 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-char pin_notation(int index) {
-  if (index == 0) return 'x';
-  if (index == 1) return '.';
-  return 'o';
-}
-
-int ans[2010];
-
 int main() {
-  int a, b;
-  cin >> a >> b;
-  vi pins(10, 0);
-  rep(i, a) {
-    int val;
-    cin >> val;
-    pins[val] = 1;
-  }
-  rep(i, b) {
-    int val;
-    cin >> val;
-    pins[val] = 2;
-  }
-  vs ans;
-  rep(i, 4) {
-    string tmp = "";
-    if (i == 0) {
-      tmp += pin_notation(pins[7]);
-      tmp += " ";
-      tmp += pin_notation(pins[8]);
-      tmp += " ";
-      tmp += pin_notation(pins[9]);
-      tmp += " ";
-      tmp += pin_notation(pins[0]);
+  ll N, M;
+  cin >> N >> M;
+  vl A(N);
+  rep(i, N) cin >> A[i];
+  vl B(M), C(M);
+  vvl I(M, vl());
+  rep(i, M) {
+    cin >> B[i] >> C[i];
+    rep(j, C[i]) {
+      ll val;
+      cin >> val;
+      val--;
+      I[i].push_back(val);
     }
-    if (i == 1) {
-      tmp += " ";
-      tmp += pin_notation(pins[4]);
-      tmp += " ";
-      tmp += pin_notation(pins[5]);
-      tmp += " ";
-      tmp += pin_notation(pins[6]);
-    }
-    if (i == 2) {
-      tmp += "  ";
-      tmp += pin_notation(pins[2]);
-      tmp += " ";
-      tmp += pin_notation(pins[3]);
-    }
-    if (i == 3) {
-      tmp += "   ";
-      tmp += pin_notation(pins[1]);
-    }
-    ans.push_back(tmp);
   }
-  rep(i, 4) {
-    cout << ans[i] << endl;
+  debug(A);
+  debug(B);
+  debug(C);
+  ll ans = 0;
+  // bit全探索
+  rep(i, (1 << N)) {
+    // 今の状態数のスコア
+    ll current = 0;
+    // アイドルの数
+    ll count = 0;
+    // 今の状態数が選んでいるアイドルの基礎値を足す
+    rep3(j, 0, N) {
+      if (i & (1 << j)) {
+        current += A[j];
+        count++;
+      }
+    }
+    if (count != 9) continue;
+    debug(bitset<20>(i));
+    debug(current);
+    // コンボボーナスを計算する
+    rep(j, M) {
+      // 必要なアイドルのカウント
+      ll count = 0;
+      rep(k, C[j]) {
+        debug(I[j][k]);
+        if (i & (1 << I[j][k])) count++;
+      }
+      if (count >= 3) current += B[j];
+    }
+    chmax(ans, current);
   }
+  cout << ans << endl;
   return 0;
 }

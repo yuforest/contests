@@ -57,8 +57,46 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
 int main() {
+  int n,m;
+  cin >> n >> m;
+  vector<int> a(n);
+  for (int i = 0; i < n; i++) cin >> a[i];
+  // 使える数はこの集合に入れておく
+  // 使える区間の最小値を求める問題は
+  // setを使って使える数を管理して、
+  // 使えない数ができた時点で消す
+  // 使える数が増えた時点で追加するといった操作をすることで
+  // *(st.begin())などを使って使える数の最小値を定数時間で
+  // 取ってくることができる
+  set<int> st;
+  // 0からNまでの数を入れる
+  for (int i = 0; i <= n; i++) {
+    st.insert(i);
+  }
+  int ans = n;
+  vector<int> cnt(n,0);
+  // 先頭からM個の数の登場回数をカウント
+  for (int i = 0; i < m; i++) {
+    cnt[a[i]]++;
+    // 登場した数は消す
+    if (cnt[a[i]] == 1) st.erase(a[i]);
+  }
+  // 初期状態で使える数の最小値をセット
+  ans = min(ans, *(st.begin()));
+  for (int i = m; i < n; i++) {
+    // スライドするので現在の区間に入っている数のカウントを増減させる
+    cnt[a[i]]++; cnt[a[i-m]]--;
+    // 消えた数と追加された数が同じではない場合
+    if (a[i] != a[i-m]) {
+      // 増えた数が1になった時点で使えなくなる
+      if (cnt[a[i]] == 1) st.erase(a[i]);
+      // 減った数が0になった時点で使えるようになる
+      if (cnt[a[i-m]] == 0) st.insert(a[i-m]);
+    }
+    // 現在の最小値より使える数の中の最小値が小さければ更新する
+    ans = min(ans, *(st.begin()));
+  }
+  cout << ans << endl;
   return 0;
 }

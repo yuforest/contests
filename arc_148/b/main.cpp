@@ -60,19 +60,54 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+int n;
+string st,tmp,ans;
 
-int main() {
-  string S, T;
-  cin >> S >> T;
-  if (S.size() > T.size()) {
-    cout << "No" << endl;
-    return 0;
-  }
-  string ans = "Yes";
-  rep(i, S.size()) {
-    if (S[i] != T[i]) ans = "No";
+int main(){
+  cin>>n;
+  cin>>st;
+  ans=st;
+  char tmp1 = 'd'^20;
+  char tmp2 = 'p'^20;
+  debug(tmp1);
+  debug(tmp2);
+  // n文字を全探索する、これはLを探索しているということ
+  // 全体の計算量はO(N^2)
+  // 5000^2=25000000で間に合う
+  for(int i=0;i<n;i++) {
+    // 文字列がdならばスキップ、pならば最初にいてほしくないので操作を行う
+    // 探索していって最初にpが現れる箇所がLとして固定することができる
+    // なぜならこれは反転しないと辞書順最小にならないから
+    if(st[i]=='d') continue;
+    // iからn文字目までを全探索
+    // これはRを探索しているということになる
+    // ここの計算量はO(N)
+    for(int j=i;j<n;j++){
+      // 現在の文字列を保存
+      tmp=st;
+      // i文字目からj文字目までを反転
+      // これで文字の種類は変えずに180度反転したことになるので
+      // あとはi文字目からj文字目までの文字の種類を現在とは別のものに変えてあげれば良い
+      reverse(tmp.begin()+i,tmp.begin()+j+1);
+      // i文字目からj文字目までに対して操作を行う
+      for(int k=i;k<=j;k++){
+        // k番目の文字列を反転させる処理
+        // 'p'^'d'は20となる
+        // 'd'^20='p'
+        // 'p'^20='d'
+        // 'p'^'d'ではXORを取ることで'p'と'd'で片方だけフラグが立っているところを調べている
+        // その結果を文字にXORすることでフラグが立っていれば立てて、フラグが下がっているなら立てる
+        // その結果文字を反転するという操作になる
+        // 文字列反転の方法は覚えておきたい
+        tmp[k]^='p'^'d';
+      }
+      // 辞書順に小さい方でansを更新
+      debug(tmp);
+      ans = min(ans, tmp);
+    }
+    // 最初にpが現れたところで操作をしたら終了
+    break;
   }
   cout << ans << endl;
-  return 0;
+	return 0;
 }

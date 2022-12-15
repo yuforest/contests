@@ -57,66 +57,73 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
-
+// この問題は単一始点最短閉路問題と見ることができる
+// そして頂点1から始まって頂点1に帰ってくるが、同じ経路を通ってはいけないので
+// 経路における頂点1に隣接する点を通る回数は2回となる
+// その隣接する点から隣接する点への最短経路問題と見て、最後に1との距離を足してあげれば
+// 距離を求めることができる
+// その1に隣接する点の組み合わせの中で最も距離が短いものが答えとなる(N*(N-1)/2=O(N^2))
+// この場合単一始点ではないのでDijkstraのN^2と合わせてO(N^4)となってしまう
+// よってワーシャルフロイド法を用いてN^3で計算した方が良い
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
+  long long int n, m;
+  cin >> n >> m;
+
+  long long int d[301][301] = {};
+
+  // 初期化
+  for ( long long int i = 0; i <= n; i++ ) {
+    for ( long long int j = 0; j <= n; j++ ) {
+      // 10^11程度
+      d[i][j] = 100000000000;
     }
   }
 
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
+  // 入力を受け取って距離を設定する
+  for ( long long int i = 0; i < m; i++ ) {
+    long long int u, v, l;
+    cin >> u >> v >> l;
+
+    // 双方向グラフ
+    d[u][v] = l;
+    d[v][u] = l;
   }
 
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
+  // ワーシャルフロイド法を使ってjからkにiを経由していった場合の最短距離を求める
+  // ここで1と隣接している辺は考慮したくないのでi,j,k全て2から始める
+  // iは経由点
+  for ( long long int i = 2; i <= n; i++ ) {
+    for ( long long int j = 2; j <= n; j++ ) {
+      for ( long long int k = 2; k <= n; k++ ) {
+        // 最小値更新
+        d[j][k] = min( d[j][k], d[j][i] + d[i][k] );
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
     }
   }
-  cout << ans << endl;
+  // 大きな値で初期化
+  long long int ans = 100000000000;
+
+  // O(N^2)
+  // 異なるiとjを全探索する、i<jとしてよい
+  // なぜならi=jの時は経路として成り立たず、j<iとなるような経路はi<j
+  // である経路を逆に辿ったものであるため
+  // 今回は無向グラフであるため、関係ない
+  for ( long long int i = 2; i <= n; i++ ) {
+    // iとjは異なる必要がある
+    for ( long long int j = i + 1; j <= n; j++ ) {
+      // 1からiに行き、iからjに行き、jから1に行った場合の最短経路
+      long long int k = d[1][i] + d[1][j] + d[i][j];
+      // 最小値更新
+      ans = min( ans, k );
+    }
+  }
+  // 例えば1から辺が1つしか伸びていない場合は最適な計画を立てることができない
+  // 行きと帰りの経路は異なる必要があるため
+  if ( ans > 1000000000 ) {
+    cout << -1 << endl;
+  }else {
+    cout << ans << endl;
+  }
+
   return 0;
 }

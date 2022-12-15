@@ -57,8 +57,39 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
 int main() {
+  int N, M;
+  cin >> N >> M;
+  // Bは現在の街まで訪問した時の金の最安値を保存する配列
+  // dp[i] : 街iに到達できる街 (街 i 自身を含まない) における金の最安値
+  vector<int> A(N), B(N, INT_MAX);
+  for(int& a : A) cin >> a;
+  // グラフを受け取る二次元配列
+  vector<vector<int>> g(N);
+  while(M--){
+    int X, Y;
+    cin >> X >> Y;
+    X--; Y--;
+    // 単方向グラフ
+    g[X].push_back(Y);
+  }
+  int ans = INT_MIN;
+  // 0からN-1までを順番に訪問
+  // Xi < Yiなので閉路ができることはなく、小さい街から大きい街にしか行けない
+  // 大きい街から小さい街に戻ることはない
+  // このグラフは DAG (Directed Acyclic Graph, 閉路を含まない有向グラフ)になっている
+  for(int i = 0; i < N; i++){
+    // 利益の最大値を更新
+    // 買った街で売ることはできないから最初に利益の更新を行う
+    chmax(ans, A[i] - B[i]);
+    // この街の金価格でこの街まで訪問した時の金価格の最小値を更新
+    chmin(B[i], A[i]);
+    // この街から行ける街の金価格の最小値を現在の街の金価格の最小値で更新
+    for(int j : g[i]) chmin(B[j], B[i]);
+    debug(i);
+    debug(ans);
+    debug(B);
+  }
+  cout << ans << endl;
   return 0;
 }

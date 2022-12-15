@@ -56,35 +56,35 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+ll A, B, C;
+const double PI = acos(-1.0);
+double f(double t) {
+  return A*t + B * sin(C*t*PI);
+}
 
 int main() {
-  ll N, L, R;
-  cin >> N >> L >> R;
-  ll A[N+1];
-  rep(i, N) {
-    cin >> A[i+1];
+  cin >> A >> B >> C;
+  // 100 = At + Bsin(Ctπ)
+  // -1 <= sin(x) <= 1
+  // -B <= Bsin(x) <= B
+  // この関数はA,B,Cが正でなので右肩上がりの直線にsinの曲線が合わさったものになりそう
+  // 二分探索だとsin部分が邪魔になって解けないかも->f(t)はtに対して連続であるので
+  // f(x1)<=100<=f(x2)の時x1とx2の間に必ずf(t)=100となるtが存在する(平均値の定理)
+  double low = 0;
+  // このとき絶対f(high)>=100
+  double high = 200;
+  rep(i, 10000) {
+    // 誤差が十分に小さくなったらbreak
+    if (abs(f(low)-100) < 1e-12) break;
+    double mid = (low+high) / 2;
+    debug(f(mid));
+    // lowとhighの中間が100より小さければ左側を右に詰める
+    if (f(mid)<100) low = mid;
+    // 100以上であれば右側を左に詰める
+    else high = mid;
+    // 上記の過程を行う中でlowとhighは探索範囲を狭めつつも1つの解もその範囲内に含まなくなって
+    // しまうことはなく結果として十分な回数探索を行うことで限りなく近い階を求めることができる
   }
-  // dpxは右端からの変更、dpyは左端からの変更
-  ll dpx[N+1], dpy[N+1], ans;
-  dpx[0] = 0;
-  dpy[0] = 0;
-
-  // 累積和的に左端から現在の場所までの最小値を導く
-  for(ll i=1; i<=N; i++){
-    // ここまでを変えた時に全てをLにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpx[i] = min(dpx[i-1] + A[i], i*L);
-	}
-  // 累積和的に右端から現在の場所までの最小値を導く
-	for(ll i=1; i<=N; i++) {
-     // ここまでを変えた時に全てをRにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpy[i] = min(dpy[i-1] + A[N-i+1], i*R);
-	}
-  // yが最高でNにした時の最小値
-  ans = dpx[0]+dpy[N];
-	for(ll i=1; i<=N; i++) {
-		ans = min(ans, dpx[i] + dpy[N-i]);
-	}
-	cout << ans << endl;
-
+  cout << fixed << setprecision(18) << low << endl;
   return 0;
 }

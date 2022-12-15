@@ -57,66 +57,48 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int N, M;
-
 int main() {
-  int H1, W1;
-  cin >> H1 >> W1;
-  int A[H1][W1];
-  rep(i, H1) {
-    rep(j, W1) {
-      cin >> A[i][j];
-    }
+  ll N;
+  cin >> N;
+  ll a, b;
+  cin >> a >> b;
+  a--;b--;
+  ll M;
+  cin >> M;
+  rep(i, M) {
+    ll x, y;
+    cin >> x >> y;
+    x--;
+    y--;
+    G[x].push_back(y);
+    G[y].push_back(x);
   }
-
-  int H2, W2;
-  cin >> H2 >> W2;
-  int B[H2][W2];
-  rep(i, H2) {
-    rep(j, W2) {
-      cin >> B[i][j];
-    }
-  }
-
-  string ans = "No";
-  rep(h_bit, 1 << H1) {
-    rep(w_bit, 1 << W1) {
-      int b_h = 0;
-      int b_w = 0;
-      int a_h_size = 0;
-      int a_w_size = 0;
-      bool ok = true;
-      rep(i, H1) {
-        // この行は削除されている
-        if (!(h_bit & (1 << i))) continue;
-        a_h_size++;
-        a_w_size = 0;
-        rep(j, W1) {
-          // この列は削除されている
-          if (!(w_bit & (1 << j))) continue;
-          a_w_size++;
-          debug(A[i][j]);
-          if (B[b_h][b_w] != A[i][j]) {
-            ok = false;
-          }
-          if (b_w == W2-1) {
-            b_w = 0;
-            b_h++;
-          } else {
-            b_w++;
-          }
-        }
-        debug("---");
+  // その町までの距離と訪問回数を入れる
+  vpll dist(N, {-1, 0});
+  dist[a].first = 0;
+  dist[a].second = 1;
+  queue<ll> que;
+  que.push(a);
+  while(!que.empty()) {
+    ll val = que.front();
+    que.pop();
+    for(auto x: G[val]) {
+      if (dist[x].first != -1) {
+        // 既に訪問済みの場合、最短経路でなければcontinue
+        if (dist[x].first != dist[val].first + 1) continue;
+        // 現在いるマスの経路数を足してmodをとる
+        dist[x].second += dist[val].second;
+        dist[x].second %= mod;
+      } else {
+        // 訪問済みでなければ最短距離を記録して現在いるマスの経路数を足してmodをとる
+        dist[x].first = dist[val].first + 1;
+        dist[x].second += dist[val].second;
+        dist[x].second %= mod;
+        // 後で探索するように追加
+        que.push(x);
       }
-      debug(a_h_size);
-      debug(a_w_size);
-      if (a_h_size == H2 && a_w_size == W2 && ok) {
-        ans = "Yes";
-      }
-      debug("\n");
     }
   }
-  cout << ans << endl;
+  cout << dist[b].second << endl;
   return 0;
 }

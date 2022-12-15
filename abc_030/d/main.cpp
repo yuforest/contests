@@ -38,6 +38,9 @@ vector<ll> G[1 << 18];
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
 #define all(x) (x).begin(), (x).end()
+#define per(i, b) per3(i, 0, b)
+#define per3(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
+#define sz(x) (int)(x).size()
 
 // 無くても困らない
 #define INFTY (1 << 30)
@@ -56,35 +59,70 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+int N, a;
+int b[100000];
+int ts[100000];
+string K;
+int main(){
+  cin >> N >> a;
+  --a;
+  cin >> K;
 
-int main() {
-  ll N, L, R;
-  cin >> N >> L >> R;
-  ll A[N+1];
-  rep(i, N) {
-    cin >> A[i+1];
+  for(int i=0;i<N;i++){
+    cin >> b[i];
+    --b[i];
   }
-  // dpxは右端からの変更、dpyは左端からの変更
-  ll dpx[N+1], dpy[N+1], ans;
-  dpx[0] = 0;
-  dpy[0] = 0;
 
-  // 累積和的に左端から現在の場所までの最小値を導く
-  for(ll i=1; i<=N; i++){
-    // ここまでを変えた時に全てをLにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpx[i] = min(dpx[i-1] + A[i], i*L);
-	}
-  // 累積和的に右端から現在の場所までの最小値を導く
-	for(ll i=1; i<=N; i++) {
-     // ここまでを変えた時に全てをRにしてしまったほうが小さいか、1つ前までの合計に今の値を足したほうが小さいか
-		dpy[i] = min(dpy[i-1] + A[N-i+1], i*R);
-	}
-  // yが最高でNにした時の最小値
-  ans = dpx[0]+dpy[N];
-	for(ll i=1; i<=N; i++) {
-		ans = min(ans, dpx[i] + dpy[N-i]);
-	}
-	cout << ans << endl;
+  // Kが6桁以内であればシミュレーションするだけで答えが出せる
+  // 愚直解
+  if(K.size() < 7){
+    int k = stoi(K);
+    for(int i=0;i<k;i++){
+      a = b[a];
+    }
+    cout << a+1 << endl;
+    return 0;
+  }
 
-  return 0;
+  // tsの配列に全て-1を入れる
+  memset(ts, -1, sizeof(ts));
+
+  // tsの配列に辞書の番号に対する遷移する順番をaから順に入れていく
+  int t = 0;
+  // ts[a]に値が入っていない限り続ける
+  for(;ts[a]==-1;){
+    ts[a] = t;
+    ++t;
+    debug(a);
+    debug(b[a]);
+    a = b[a];
+  }
+
+  debug(ts[a]);
+  rep(i, N) debug(ts[i]);
+  // 一度通った点にたどり着くまでの移動回数-ループの始点までの移動回数
+  // つまり閉路の頂点数がmodになる
+  int mod = t - ts[a];
+  int k = 0;
+  debug(mod);
+
+  // Kを初めから見ていって、(10k + 今の桁)をmodで割ったあまりを見ていけば
+  // 最終的に最初の位置から何回遷移すれば良いのかわかる
+  // modはN以下なので10^5程度となり間に合う
+  // 最初から見ていき10倍しながらmodを取るのはループ回数が非常に大きい時の典型テクニック
+  for(char& c : K){
+    k = (k * 10 + c - '0') % mod;
+  }
+  // 閉路の最初の点からどれだけ移動すればよいのか求める
+  // (k - ts[a])によって閉路の最初の点に移動する回数を引いている
+  // (k - ts[a])は負になる可能性があるので、
+  // 負にならないようにmodを足して、再度あまりを取っている
+  k = ((k - ts[a]) % mod + mod) % mod;
+
+  // k回遷移する
+  for(;k>0;k--){
+    a = b[a];
+  }
+
+  cout << a+1 << endl;
 }

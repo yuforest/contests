@@ -57,34 +57,40 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
+using mint = modint998244353;
 int main() {
+  // 解の最大ケースは2^N-1通り(空の部分集合を除く)
+  // iとf(i)が一致しているもの同士ではそれを選ぶか選ばないかで通り数を作ることができる
+  // 例えばその数をAとすると2^A-1通りの数を作ることができる
+  // そうでない数同士でも互いに解が循環している組み合わせであればカウントする
+  // つまりi=1,2,3に対してそれぞれf(i)=3,2,1のようなものは1つとしてカウントできる
+  // 循環の組み合わせがある時その部分集合内で他に組み合わせができることはない
+  // ただしiとf(i)が一致しているものであれば組み合わせて解を作ることができるので
+  // その組み合わせ分増える(この時は空集合も含んで良い)
+  // この問題をグラフ的に考えると入次数と出次数がそれぞれ1のN個の頂点(iとf(i)が同じものは自己ループ)
+  // において閉路のある個々の連結成分の組み合わせは何通り作れるかという問題になる
+  // UnionFindで単に連結して、リーダーが自分自身の頂点数を数えても良い
   int N;
-  cin >> N;
-  vi A(N);
-  vi B(N);
-  vi C(N);
+  cin>>N;
 
-  rep(i, N) cin >> A[i];
-  rep(i, N) cin >> B[i];
-  rep(i, N) cin >> C[i];
-  int a = 0;
-  int b = 0;
-  int c = 0;
-  sort(A.begin(), A.end());
-  sort(B.begin(), B.end());
-  sort(C.begin(), C.end());
-  int ans = 0;
-  while(a < N && b < N && c < N) {
-    if (A[a] >= B[b]) b++;
-    if (B[b] >= C[c]) c++;
-    if (A[a] < B[b] && B[b] < C[c]) {
-      ans++;
-      a++;b++;c++;
-    }
+  dsu D(N);
+  rep(i,N){
+    int u;
+    cin>>u;
+    u--;
+    D.merge(i,u);
   }
-  cout << ans << endl;
 
+  int cnt =0;
+  rep(i,N){
+    if(D.leader(i)==i)cnt++;
+  }
+  debug(cnt);
+
+  mint ans = mint(2).pow(cnt);
+  ans--;
+
+  cout<<ans.val()<<endl;
 
   return 0;
 }
