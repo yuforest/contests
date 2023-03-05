@@ -60,32 +60,38 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
-    }
+  ll N;
+  cin >> N;
+  vl color(2 * N);
+  rep(i, N) cin >> color[i];
+  rep3(i, N, 2*N) {
+    color[i] = color[i-N];
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
+  debug(color);
+  bool all_black = true;
+  bool all_red = true;
+  rep(i, N) {
+    if (color[i] == 1) all_black = false;
+    if (color[i] == 0) all_red = false;
   }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
+  if (all_black || all_red) {
+    cout << -1 << endl;
+    return 0;
+  }
+  ll longest = 0;
+  ll cnt = 1;
+  rep3(i, 1, 2 * N) {
+    if (color[i] == color[i-1]) cnt++;
+    else {
+      chmax(longest, cnt);
+      cnt = 1;
+    }
+    debug(i);
+    debug(cnt);
+  }
+  chmax(longest, cnt);
+  debug(longest);
+  cout << (longest + 1) / 2 << endl;
+
 }

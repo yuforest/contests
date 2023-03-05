@@ -63,29 +63,47 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
+  ll H, W;
+  cin >> H >> W;
+  vvl C(H+1, vl(W+1));
+  rep3(i, 1, H+1) rep3(j, 1, W+1) {
+    cin >> C[i][j];
+  }
+  debug(C);
+  // 累積和を保存する
+  vvl black(H+1, vl(W+1, 0));
+  vvl white(H+1, vl(W+1, 0));
+  // 累積和の計算
+  rep3(i, 1, H+1) rep3(j, 1, W+1) {
+    if ((i+j) % 2 == 0) {
+      black[i][j] = black[i-1][j] + black[i][j-1] - black[i-1][j-1] + C[i][j];
+      white[i][j] = white[i-1][j] + white[i][j-1] - white[i-1][j-1];
+    } else {
+      white[i][j] = white[i-1][j] + white[i][j-1] - white[i-1][j-1] + C[i][j];
+      black[i][j] = black[i-1][j] + black[i][j-1] - black[i-1][j-1];
     }
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
+  ll ans = 0;
+  rep3(y1, 1, H+1) rep3(x1, 1, W+1) rep3(y2, y1, H+1) rep3(x2, x1, W+1) {
+    // debug(y1);
+    // debug(x1);
+    // debug(y2);
+    // debug(x2);
+    ll black_sum = black[y2][x2] - black[y1-1][x2] - black[y2][x1-1] + black[y1-1][x1-1];
+    ll white_sum = white[y2][x2] - white[y1-1][x2] - white[y2][x1-1] + white[y1-1][x1-1];
+    if (y1 == 2 && x1 == 2 && y2 == 3 && x2 == 4) {
+      debug(black_sum);
+      debug(white_sum);
+    }
+    debug(black_sum);
+    debug(white_sum);
+    ll area = (y2-y1+1) * (x2-x1+1);
+    if (black_sum == white_sum) {
+      chmax(ans, area);
     }
   }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
+  debug(white);
+  debug(black);
+  cout << ans << endl;
   return 0;
 }

@@ -60,32 +60,34 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+int main(){
+  ll L,b[100005],a[100005];
+  // 入力
+  cin >> L;
+  for(int i=1;i<=L;i++) cin >> b[i];
 
-int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
+  a[1]=0;
+  // B1 = A1 ^ A2よりA2 = A1 ^ B1
+  // B2 = A2 ^ A3よりA3 = A2 ^ B2 = (A1 ^ B1) ^ B2
+  // 一般にAi = A1 ^ B1 ^ B2 ^... ^ Bi-1(i >= 2)が成り立つ
+  // よってA1が定まれば、A2からANまでの全ての値がB1からBN-1までの
+  // 値を用いて一意に定まる
+  for(int i=1;i<=L;i++){
+    a[i+1]=b[i]^a[i];
+  }
+  // BN = AN ^ A1と矛盾する場合がある
+  // AN ^ A1 = B1 ^ B2 ^ ... ^ BN-1となるので
+  // BNはA1に依存せずにB1 ^ B2 ^ ... ^ BN-1に一致するはずである
+  // よって矛盾したなら解は存在せず、矛盾しないならA1を任意に指定した後解が一意に定まる
+  // 解が存在する場合に辞書順最小になるためにはA1が小さい方が良い
+  // 今回A1=0のケースがただ一通りだけ存在するのでその1通りが辞書順最小の値になる
+  // a[L+1]はA1=0の時B1 ^ B2 ^ ... ^ BN-1 ^ BNに等しい
+  // BN = B1 ^ B2 ^ ... ^ BN-1なので
+  // a[L+1]は0にならないと矛盾する
+  if(a[L+1]!=0) cout << -1 << endl;
+  else {
+    for(int i=1;i<=L;i++){
+      printf("%d\n",a[i]);
     }
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
-  }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
 }

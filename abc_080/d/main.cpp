@@ -57,36 +57,32 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-ll N, H;
-ll A[100007], B[100007];
-
-int main(){
-  cin >> N >> H;
+int N, C;
+int imos[30][101010];
+int main() {
+  cin >> N >> C;
   rep(i, N) {
-    cin >> A[i] >> B[i];
+    int a, b, c;
+    cin >> a >> b >> c;
+    a--; c--;
+    imos[c][a]++;
+    imos[c][b]--;
   }
-  ll ma = 0;
-  // 振る刀を選ぶ
-  rep(i, N) ma = max(ma, A[i]);
+  // 累積和を計算する
+  rep(c, C) rep3(i, 1, 101010) imos[c][i] += imos[c][i - 1];
+  // ダブっている区間が1ではなく2になるので、
+  // 1以上のものを1にする
+  rep(c, C) rep(i, 101010) if (imos[c][i]) imos[c][i] = 1;
 
-  vector<ll> v;
-  // 投げる刀を選ぶ
-  rep(i, N) if (ma < B[i]) v.push_back(B[i]);
-  // 大きい順にソート
-  sort(v.begin(), v.end(), greater<int>());
-
-  ll ans = 0;
-  fore(x, v) {
-    ans++;
-    H -= x;
-    if (H <= 0) {
-      cout << ans << endl;
-      return 0;
-    }
+  int ans = 0;
+  // 全ての時間について
+  rep(i, 101010) {
+    // その時間に何チャンネルが放送されているか
+    int cnt = 0;
+    // チャンネルを見ていく
+    rep(c, C) cnt += imos[c][i];
+    // 最大値更新
+    ans = max(ans, cnt);
   }
-  // 繰り上げ計算
-  ans += (H + ma - 1) / ma;
   cout << ans << endl;
-
-  return 0;
 }

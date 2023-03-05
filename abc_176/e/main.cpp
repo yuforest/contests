@@ -57,8 +57,79 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+typedef pair<int, int> i_i;
+int H, W, M;
+set<i_i> st;
+
+void input() {
+  cin >> H >> W >> M;
+  for(int i = 0; i < M; i++) {
+    int a, b;
+    cin >> a >> b;
+    st.insert({a, b});
+  }
+}
+
+void solve() {
+  map<int, int> mph, mpw;
+  int hmaxval = 0;
+  int wmaxval = 0;
+  vector<int> hmax, wmax;
+  // mapを構築して、最大の爆破対象がある行と列を求める
+  // 独立に爆破対象を求めればよい
+  for(auto tmp : st) {
+    mph[tmp.first]++;
+    mpw[tmp.second]++;
+    chmax(hmaxval, mph[tmp.first]);
+    chmax(wmaxval, mpw[tmp.second]);
+  }
+  // 最大の行であれば、その行をhmaxに追加
+  for(auto tmp : mph) {
+    if(hmaxval == tmp.second) hmax.push_back(tmp.first);
+  }
+  // 最大の列であれば、その列をwmaxに追加
+  for(auto tmp : mpw) {
+    if(wmaxval == tmp.second) wmax.push_back(tmp.first);
+  }
+  // 爆弾をおくマスに爆破対象がある場合
+  int ANS = hmaxval + wmaxval - 1;
+  // RAが最大かつ CBが最大で、
+  // (A,B) に爆発対象が存在しない(A,B) の組み合わせが存在するかどうかを調べる必要がある
+  // 爆発対象が存在するマスは高々 M 個しか存在しないため、調べる回数は M 回以下
+  // 例えば3*3で(1,1),(2,2),(3,3)のようにH*M個の探索候補がある場合でも
+  // (1,2)まで調べた時点でこのマスに爆発物はないのでここを爆破して答えは2個になる
+  debug(hmax);
+  debug(wmax);
+  for(auto h : hmax) {
+    for(auto w : wmax) {
+      debug(h);
+      debug(w);
+      // 今の行と列の組み合わせが爆発対象の座標でない場合は
+      // ここまで求めた答え+1が答えになる
+      if(st.find({h, w}) == st.end()) {
+        ANS++;
+        cout << ANS << endl;
+        return;
+      }
+    }
+  }
+  cout << ANS << endl;
+}
 
 int main() {
+  input();
+  solve();
   return 0;
 }
+
+// 探索候補が多いがすぐに終わる場合
+// 3 3 3
+// 2 2
+// 1 1
+// 3 3
+
+// M回探索する場合
+// 3 3 3
+// 1 1
+// 1 2
+// 1 3

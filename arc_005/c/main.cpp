@@ -60,74 +60,85 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
-const ll INF = ll(1e18);
 
-// ll N_size;
-// string bi_N = "";
-// set<ll> ans;
-// ll N;
+// 無限大を表す値
+const int INF = 1<<29;
 
-// bool used[61];
-// void dfs(ll current, ll digit) {
-//   if (bi_N[digit] == '1') {
-//     debug(digit);
-//     ll tmp = current + powl(2, digit);
-//     if (tmp <= N) ans.insert(tmp);
-//     if (digit+1 < N_size) {
-//       dfs(tmp, digit+1);
-//     }
-//   }
-//   if (current <= N) ans.insert(current);
-//   if (digit+1 < N_size) {
-//     dfs(current, digit+1);
-//   }
-// }
+// 上下左右への動きを表すベクトル
+const vector<int> dx = {1, 0, -1, 0};
+const vector<int> dy = {0, 1, 0, -1};
 
-// int main() {
-//   cin >> N;
-
-//   ll tmp_N = N;
-//   while(tmp_N > 0) {
-//     bi_N += to_string(tmp_N % 2);
-//     tmp_N /= 2;
-//   }
-//   debug(bi_N);
-//   N_size = bi_N.size();
-//   debug(N_size);
-//   dfs(0, 0);
-
-
-//   fore(x, ans) {
-//     cout << x << endl;
-//   }
-//   return 0;
-// }
-
-
-// bit全探索でも解ける
 int main() {
-  ll N;
-  cin >> N;
-  vl digits;
-  rep(i, 61){
-    if (N & (1LL << i)) {
-      digits.push_back(i);
+  // 入力
+  int H, W;  // 縦の長さ, 横の長さ
+  cin >> H >> W;
+  vector<string> field(H);
+  for (int i = 0; i < H; ++i) cin >> field[i];
+
+  // スタートとゴールのマスを割り出す
+  int sx = -1, sy = -1, gx = -1, gy = -1;
+  for (int i = 0; i < H; ++i) {
+    for (int j = 0; j < W; ++j) {
+      if (field[i][j] == 's') sx = i, sy = j;
+      if (field[i][j] == 'g') gx = i, gy = j;
     }
   }
-  debug(digits);
-  int K = digits.size();
-  vl ans;
-  rep(msk, (1LL << K)) {
-    ll tmp = 0;
-    rep(i, K) {
-      if (msk & (1LL << i)) {
-        // tmp += (1LL << digits[i]);
-        tmp += powl(2, digits[i]);
+
+  // 各頂点は pair<int,int> 型で表すことにする
+  using Node = pair<int,int>;
+  deque<Node> que;  // deque
+
+  // 初期条件
+  // dist[i][j] はマス (i, j) への最短路長を表す
+  que.push_front(Node(sx, sy));
+  vector<vector<int>> dist(H, vector<int>(W, INF));
+  dist[sx][sy] = 0;
+
+  // 0-1 BFS 開始
+  // 幅優先探索をしているがコスト0の移動を優先する
+  // O(HW)
+  // 各マスにおいて4方向を探索することで最短の壁を壊す回数を導くことができるため
+  while (!que.empty()) {
+      // deque の先頭の要素を取り出す
+      auto [x, y] = que.front();
+      que.pop_front();
+
+      // 隣接頂点を順にみていく
+      for (int dir = 0; dir < 4; ++dir) {
+        int nx = x + dx[dir];
+        int ny = y + dy[dir];
+
+        // 盤面外はスキップ
+        if (nx < 0 || nx >= H || ny < 0 || ny >= W) continue;
+
+        // コスト 0 の場合は、deque の先頭に push
+        // これは優先して探索される
+        // できるだけコスト0の移動で探索する
+        // それができなくなった段階でコスト1の移動で探索する
+        if (field[nx][ny] != '#') {
+          // 次の探索頂点のコストより低ければ探索する
+          if (dist[nx][ny] > dist[x][y]) {
+            // 距離をセット
+            dist[nx][ny] = dist[x][y];
+            que.push_front(Node(nx, ny));
+          }
+        }
+        // コスト 1 の場合は、deque の末尾に push
+        // これは後から探索される
+        else {
+          // 訪れようとしている頂点が今の頂点+1よりコストが高ければ更新する
+          // そうでなければ何もしない
+          // コスト0の移動を繰り返して移動できるようなところではここは実行されない
+          if (dist[nx][ny] > dist[x][y] + 1) {
+            // この時は壁を壊すので今のマスまでの距離+1
+            dist[nx][ny] = dist[x][y] + 1;
+            que.push_back(Node(nx, ny));
+          }
+        }
       }
-    }
-    ans.push_back(tmp);
   }
-  rep(i, ans.size()) {
-    cout << ans[i] << endl;
-  }
+
+  // 最短路長
+  if (dist[gx][gy] <= 2) cout << "YES" << endl;
+  else cout << "NO" << endl;
 }

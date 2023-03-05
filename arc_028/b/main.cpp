@@ -60,32 +60,28 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+typedef pair<ll, ll> P;
 
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
-    }
+  ll N, K;
+  cin >> N >> K;
+  vl X(N);
+  rep(i, N) cin >> X[i];
+
+  priority_queue<P> que;
+  rep(i, K-1) {
+    que.push({X[i], i+1});
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
+  debug(que);
+
+  rep3(i, K-1, N) {
+    que.push({X[i], i+1});
+    if (que.size() > K) {
+      que.pop();
     }
+    debug(que);
+    P val = que.top();
+    cout << val.second << endl;
   }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
   return 0;
 }

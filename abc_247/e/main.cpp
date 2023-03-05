@@ -60,5 +60,37 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
+  // B の連続部分列 BL,BL+1,…,BRのうち、最大値が X, 最小値が Y となるものは何個あるか。
+  // ただし B の要素は Y 以上 X 以下である。
+  // つまりB の連続部分列 BL,BL+1,…,BRのうち、X,Y がともに含まれる列は何個あるか。
+  // という問題を線形時間で解ければよい
+  // 入力
+  int N, X, Y;
+  cin>>N>>X>>Y;
+  vector<int> a(N);
+  for(int i = 0; i < N; ++i) cin>>a[i];
+  // 1. 区間[L,R]の中にX,Yがそれぞれ1つ以上存在する
+  // 2. 区間[L,R]の中にY未満の要素やXより大きい要素が存在しない
+  // 1. 区間[1,R]の中で最も右にあるX,Yの位置をposX,posYとしてL<=min(posX,posY)と同値
+  // 2. 区間[1,R]の中で最も右にある「Y未満またはXより大きい要素」の位置をBとして、B<Lであることと同値
+  int posX{-1}, posY{-1}, B{-1};
+  long long res{};
+  // Rごとに条件を満たすLの個数を求める
+  for(int i = 0; i < N; ++i) {
+    // それぞれ位置を更新
+    if(a[i] == X) posX = i;
+    if(a[i] == Y) posY = i;
+    if(a[i] < Y || X < a[i]) B = i;
+    debug(posX);
+    debug(posY);
+    debug(B);
+    // posX,posYの小さい方がLとしての条件を満たすので1からmin(posX, posY)個までが条件1を満たす
+    // その中に「Y未満またはXより大きい要素」があれば条件を満たさないので
+    // 位置を保存しておいて1からBまではLとしての条件を満たさないので引く
+    // Bは最初-1にしておいてmin(posX, posY)が0であってもBが-1なので1つは条件を満たす
+    debug(max(0, min(posX, posY) - B));
+    res += max(0, min(posX, posY) - B);
+  }
+  cout<<res<<endl;
   return 0;
 }

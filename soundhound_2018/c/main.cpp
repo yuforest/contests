@@ -60,30 +60,26 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
-const ll INF = ll(1e18);
-int main() {
-  ll N, M;
-  cin >> N >> M;
-  ll A[N];
-  rep(i, N) cin >> A[i];
-  vl S(N+1, 0);
-  rep(i, N) {
-    S[i+1] = S[i] + A[i];
-  }
-  ll ans = -INF;
-  ll current = 0;
-  rep(i, M) {
-    current += A[i] * (i+1);
-  }
-  chmax(ans, current);
-  debug(ans);
-  rep3(i, M+1, N+1) {
-    current -= S[i-1] - S[i-1-M];
-    current += M * A[i-1];
-    chmax(ans, current);
-    debug(ans);
-  }
-  cout << ans << endl;
 
+long long n, m, d;
+
+int main() {
+  cin >> n >> m >> d;
+  // まず1組の期待値を求めて、m-1通り分足せば良い(期待値の線形性)
+  // 期待値の線形性とは「和の期待値は期待値の和に等しい」こと
+  // E|X+Y| = E|X| + E|Y|
+  // ここではm-1通りの1つの組み合わせの差の絶対値がdである確率を足しあげれば良いことを指す
+  // 分母を求める
+  // d!=0である時条件を満たすペアは(1,d+1),...(n-d,n)と(d+1,1)...(n,n-d)
+  // の2(n-d)個となる
+  long long V = (n - d) * 2;
+  // d=0の時は分子がnになる
+  // 条件を満たすペアは(1,1),..(n,n)なのでn通り
+  if (d == 0) V /= 2;
+  // d=0の時はn/n^2=1/n
+  // 選び方は全部でn^2個あるのでそれで割れば良い
+  long double E = 1.0L*V / (1.0L*n*n);
+  // 求めた1つの期待値*(m-1)が答えとなる
+  printf("%.12Lf\n", 1.0L*(m - 1)*E);
   return 0;
 }

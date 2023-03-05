@@ -60,30 +60,56 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
-const ll INF = ll(1e18);
+
+int H, W; string S[404];
+
+int dx[4] = { 0, 1, 0, -1 }, dy[4] = { -1, 0, 1, 0 };
+int vis[404][404];
+
+pair<ll, ll> dfs(int x, int y) {
+  // 訪問済みにする
+  vis[y][x] = 1;
+  // aが今の色
+  ll a = 1, b = 0;
+  // 4方向の探索、再帰的に深さ優先探索
+  rep(i, 4) {
+    int xx = x + dx[i];
+    int yy = y + dy[i];
+    // マスの外に出たらcontinue
+    if (xx < 0 or W <= xx or yy < 0 or H <= yy) continue;
+    // 訪問済みでもcontinue
+    if (vis[yy][xx]) continue;
+    // 今の色と異なる場合は
+    if (S[y][x] != S[yy][xx]) {
+      // dfsで帰ってきた結果を足す
+      auto p = dfs(xx, yy);
+      a += p.second;
+      b += p.first;
+    }
+  }
+  // 結果を返す
+  return { a, b };
+}
+
 int main() {
-  ll N, M;
-  cin >> N >> M;
-  ll A[N];
-  rep(i, N) cin >> A[i];
-  vl S(N+1, 0);
-  rep(i, N) {
-    S[i+1] = S[i] + A[i];
-  }
-  ll ans = -INF;
-  ll current = 0;
-  rep(i, M) {
-    current += A[i] * (i+1);
-  }
-  chmax(ans, current);
-  debug(ans);
-  rep3(i, M+1, N+1) {
-    current -= S[i-1] - S[i-1-M];
-    current += M * A[i-1];
-    chmax(ans, current);
-    debug(ans);
+  // 入力
+  cin >> H >> W;
+  rep(y, H) cin >> S[y];
+
+  ll ans = 0;
+  // 全てに対して訪問済みでなければdfsをして
+  // 色が異なるマス目への連結成分を求める
+  // このとき黒から始めてどの白にも行けるので
+  // 黒の個数*白の個数が連結成分に対する組み合わせの数となる
+  rep(y, H) rep(x, W) if (!vis[y][x]) {
+    auto p = dfs(x, y);
+    debug(p);
+    // 色が異なるマス目の連結成分
+    ans += p.first * p.second;
   }
   cout << ans << endl;
-
-  return 0;
 }
+
+// 2 2
+// #.
+// .#

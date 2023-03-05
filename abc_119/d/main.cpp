@@ -56,100 +56,63 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
+int A, B, Q; ll S[101010], T[101010];
+//---------------------------------------------------------------------------------------------------
+int main() {
+  cin >> A >> B >> Q;
+  rep(i, A) cin >> S[i];
+  rep(i, B) cin >> T[i];
 
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
+  rep(q, Q) {
+    ll x;
+    cin >> x;
+    ll ans = 1e18;
 
-//   map<string,int> mp;
-//   queue<string> q;
+    // 左だけに移動
+    // 現在位置が神社と寺の最小値より大きいとき
+    if (S[0] < x && T[0] < x) {
+      // 現在地以上の1つ前を求める
+      int s = lower_bound(S, S + A, x) - S - 1;
+      int t = lower_bound(T, T + B, x) - T - 1;
+      // 距離の最大値で更新
+      chmin(ans, max(x - S[s], x - T[t]));
+    }
 
-//   mp[s]=0;
-//   q.push(s);
+    // 右だけに移動
+    // 現在位置が神社と寺の最大値より小さいとき
+    if (x < S[A-1] && x < T[B-1]) {
+      int s = lower_bound(S, S + A, x) - S;
+      int t = lower_bound(T, T + B, x) - T;
+      // 距離の最大値で更新
+      chmin(ans, max(S[s] - x, T[t] - x));
+    }
 
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
+    // 左右
+    // 神社と寺でそれぞれ一番近いものへの距離を求める
+    ll shrine = 1e18;
+    if (S[0] < x) {
+      int id = lower_bound(S, S + A, x) - S - 1;
+      chmin(shrine, x - S[id]);
+    }
+    if (x < S[A - 1]) {
+      int id = lower_bound(S, S + A, x) - S;
+      chmin(shrine, S[id] - x);
+    }
 
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
+    ll temple = 1e18;
+    if (T[0] < x) {
+      int id = lower_bound(T, T + B, x) - T - 1;
+      chmin(temple, x - T[id]);
+    }
+    if (x < T[B - 1]) {
+      int id = lower_bound(T, T + B, x) - T;
+      chmin(temple, T[id] - x);
+    }
+    // どちらも左だった場合、どちらも右だった場合で足し算してしまう可能性もあるが、
+    // この場合はずっと移動の方が良い結果になるので、問題ない
+    chmin(ans, shrine*2 + temple);
+    chmin(ans, shrine + temple * 2);
 
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+    printf("%lld\n", ans);
   }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
-  }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
-  return 0;
 }

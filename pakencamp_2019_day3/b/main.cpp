@@ -60,38 +60,19 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  ll D, N, M;
-  cin >> D >> N >> M;
-  vl shops(N);
-  vl homes(M);
-  shops[0] = 0;
-  rep3(i, 1, N) {
-    cin >> shops[i];
+  ll N;
+  cin >> N;
+  vs S(N);
+  ll cnt1=0,cnt2=0;
+  rep(i, N) {
+    cin >> S[i];
+    if (S[i] == "black") cnt1++;
+    else cnt2++;
   }
-  sort(shops.begin(), shops.end());
-  rep(i, M) {
-    cin >> homes[i];
+  if (cnt1 > cnt2) {
+    cout << "black" << endl;
+  } else {
+    cout << "white" << endl;
   }
-  debug(shops);
-  debug(homes);
-  ll ans = 0;
-  rep(i, M) {
-    auto pos = lower_bound(shops.begin(), shops.end(), homes[i]);
-    ll dist1;
-    ll dist2;
-    // 最後の店舗より先にある
-    if (pos == shops.end()) {
-      dist1 = abs(homes[i] - D);
-      dist2 = abs(homes[i] - shops[N-1]);
-    } else {
-      int index = pos - shops.begin();
-      dist1 = abs(homes[i] - shops[index]);
-      dist2 = abs(homes[i] - shops[index-1]);
-    }
-    debug(dist1);
-    debug(dist2);
-    ans += min(dist1, dist2);
-  }
-  cout << ans << endl;
   return 0;
 }

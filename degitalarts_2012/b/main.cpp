@@ -57,30 +57,55 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+// ハッシュ値の計算
+int hash_val(const string &s){
+  int ret=0;
+  for(int i=0;i<s.size();i++){
+    ret+=s[i]-'a'+1;
+  }
+  return ret;
+}
 
+bool match[27*100];
+string ss[27*100];
+
+int h=0;
+string t;
+
+// 全てのとりうるハッシュ値で入力された文字と異なるものをメモ化再帰で探索
+void dfs(string s){
+  // 今の文字列のハッシュ値を計算
+  int h=hash_val(s);
+  // 20文字より大きければ枝刈り
+  if(s.size() > 20)return;
+  // 既にマッチした文字列が過去に存在すれば枝刈り
+  // 同じようなハッシュ値になるものは過去に既に探索している
+  if(match[h])return;
+  // 入力された文字列と現在の文字列が異なる場合
+  // 例えばaのハッシュ値は1だが、他にハッシュ値が1となる文字列はないので
+  // この条件分岐内を通らない、よってこの答えはない
+  if(t != s){
+    // 答えとなる文字列を保存
+    ss[h]=s;
+
+    debug(h);
+    // 見つかったフラグを立てる
+    match[h]=true;
+  }
+  // 大きな方から再帰的に探索していく、そうすることで探索回数を少なくすることができる
+  // 少ない文字数で大きなハッシュ値を実現できるため
+  for(int i=25;i>=0;i--){
+    dfs(s+(char)(i+'a'));
+  }
+  return;
+}
 int main() {
-  string S, T;
-  cin >> S >> T;
-  bool ans = true;
-  rep(i, S.size()) {
-    if (S[i] == '@' && T[i] == '@') continue;
-    bool t_valid = T[i] == 'a' || T[i] == 't' || T[i] == 'c' || T[i] == 'o' || T[i] == 'd' || T[i] == 'e' || T[i] == 'r';
-    bool s_valid = S[i] == 'a' || S[i] == 't' || S[i] == 'c' || S[i] == 'o' || S[i] == 'd' || S[i] == 'e' || S[i] == 'r';
-    if (S[i] == '@') {
-      if (!t_valid) ans = false;
-
-    } else if (T[i] == '@') {
-      if (!s_valid) ans = false;
-    } else {
-      if (S[i] != T[i]) ans = false;
-    }
-    debug(ans);
-  }
-  if (ans) {
-    cout << "You can win" << endl;
-  } else {
-    cout << "You will lose" << endl;
-  }
+  string s;
+  cin>>s;
+  t=s;
+  dfs("");
+  string ret=ss[hash_val(s)];
+  if(ret=="") ret="NO";
+  cout<<ret<<endl;
   return 0;
 }

@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-// #include <atcoder/all>
-// using namespace atcoder;
+#include <atcoder/all>
+using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -60,61 +60,83 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
 
-int main() {
-  int n,m;
-  cin >> n >> m;
-  vector<int>A(n);
-  rep3(i,0,n)cin >> A[i];
-  vector<vector<int>>G(n);
-  // 頂点を削除するときのコストの総和
-  vector<ll>c(n);
-  // 辺の入力
-  rep3(i,0,m){
-    int x,y;
-    cin >> x >> y;
-    x--,y--;
-    G[x].push_back(y);
-    G[y].push_back(x);
-    // xを削除するためのコストにyの頂点に書かれている番号をたす
-    c[x]+=A[y];
-    // yを削除するためのコストにxの頂点に書かれている番号をたす
-    c[y]+=A[x];
-  }
-  // 「現時点でコストが最も低い頂点」を取得するためにpriority_queueを使う
-  priority_queue<pair<ll,int>>pq;
-  // priority_queueはデフォルトで降順なのでマイナスをかけて、
-  // 本来のコストが小さいもの(コストの絶対値が小さいもの)から取り出せるようにしている
-  // コストと頂点番号をpush
-  rep3(i,0,n)pq.push({-c[i],i});
-  vector<bool>erased(n);
-  ll ans = 0;
-  // 各頂点を消すために必要なコストは増えないので、どの時点についても、
-  // 「現時点で必要なことが確定しているコスト」以下のコストで消せる頂点は消してしまっても良い
-  // したがって、「現時点でコストが最も低い頂点に対して操作を行う」を N回繰り返すのが最適
-  // 消された頂点はerasedがtrueになるので、操作は最大N回しか行われない
-  while(!pq.empty()){
-    // コストと頂点番号を取り出す
-    auto[cost,x] = pq.top();
-    pq.pop();
-    // 元のコストに戻している
-    cost = -cost;
-    if(erased[x])continue;
-    erased[x] = true;
-    // この頂点を消すためのコストと既に消した頂点を消すためのコストのどちらが大きいかで更新
-    ans = max(ans, cost);
-    // 消去した頂点xに繋がっている頂点が消されていなければ、
-    // コストを減らして、減らしたコストをpush
-    // 減らした後のコストの方が小さければそちらが先に取り出されることになる
-    for(auto y:G[x])if(!erased[y]){
-      // 探索頂点のコストから消去した頂点のコストを除く
-      c[y] -= A[x];
-      // 改めて頂点をqueに追加する
-      pq.push({-c[y],y});
+#define maxn 2086
+const int p = 1e9 + 7;
+int n, m;
+char s[maxn][maxn];
+int ans, sum;
+int a[maxn][maxn][4];
+int pw[maxn * maxn];
+
+int main(){
+  scanf("%d%d", &n, &m);
+  for(int i = 1;i <= n;i++) scanf("%s", s[i] + 1);
+  // 左から右への散らかっていないマスの累積カウント
+  for(int i = 1;i <= n;i++){
+    int cnt = 0;
+    for(int j = 1;j <= m;j++){
+      // 散らかっていないマスの総数を数えておく
+      sum += s[i][j] == '.';
+      if(s[i][j] == '.') cnt++;
+      else cnt = 0;
+      a[i][j][0] = cnt;
     }
   }
-
-  cout << ans << endl;
-  return 0;
+  // 右から左への散らかっていないマスの累積カウント
+  for(int i = 1;i <= n;i++){
+    int cnt = 0;
+    for(int j = m;j;j--){
+      if(s[i][j] == '.') cnt++;
+      else cnt = 0;
+      a[i][j][1] = cnt;
+    }
+  }
+  // 上から下への散らかっていないマスの累積カウント
+  for(int j = 1;j <= m;j++){
+    int cnt = 0;
+    for(int i = 1;i <= n;i++){
+      if(s[i][j] == '.') cnt++;
+      else cnt = 0;
+      a[i][j][2] = cnt;
+    }
+  }
+  // 下から上への散らかっていないマスの累積カウント
+  for(int j = 1;j <= m;j++){
+    int cnt = 0;
+    for(int i = n;i;i--){
+      if(s[i][j] == '.') cnt++;
+      else cnt = 0;
+      a[i][j][3] = cnt;
+    }
+  }
+  pw[0] = 1;
+  // 添字の数だけ照明を配置する点があったとして何通りの置き方があるか
+  for(int i = 1;i < maxn * maxn;i++) pw[i] = 1ll * pw[i - 1] * 2 % p;
+  // 主客転倒のテクニック
+  // 散らかっていないが照らされないマスの数を求める
+  // 全ての照らされるマスの合計はK*2^K通りある
+  // K通りのマスに対して、今見ているマスが照らされない時の通り数を求める
+  // そして最後に全ての通り数から、照らされないマスの通り数を引く
+  for(int i = 1;i <= n;i++){
+    for(int j = 1;j <= m;j++){
+      // 散らかっているマスは無視
+      if(s[i][j] != '.') continue;
+      // (a[i][j][0] + a[i][j][1] + a[i][j][2] + a[i][j][3] - 3)は、
+      // そのマスを中心とした四方向の散らかっていないマスの数
+      // sumから四方向の散らかっていないマスの数を引くと
+      // そのマスに照明を設置した時に照らされないマスの数となる
+      // あるマスが照らされないようにするには、そのマス伸びる空きますとそのマス自身には照明を設置できない
+      // ただし他のマスは正面が置かれていても問題ない
+      // よってそのマスから4方向に伸びる空きマスとそのマス自身を合わせた個数をTとすると
+      // 2^(K-T)通りの置き方がある
+      ans = (ans + pw[sum - (a[i][j][0] + a[i][j][1] + a[i][j][2] + a[i][j][3] - 3)]) % p;
+    }
+  }
+  // 散らかっていない全てのマスが照らされる場合の数から
+  // 散らかっていないが照らされないマスの数を引くと
+  // 散らかっていないが照らされるマスの数となる
+  // 答えが負になる場合があるのでpを足しておく
+  ll val = (1ll * sum * pw[sum] + p - ans) % p;
+  cout << val << endl;
 }

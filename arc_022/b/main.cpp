@@ -60,32 +60,28 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
+  ll N;
+  cin >> N;
+  vl A(N);
+  rep(i, N) cin >> A[i];
+  set<ll> st;
+  ll ans = 0;
+  ll L = 0;
+  // しゃくとり法を行う
+  rep(R, N) {
+    // 今の右側の値が含まれなくなるまでLを進める
+    while (st.find(A[R]) != st.end()) {
+      st.erase(A[L]);
+      L++;
     }
+    // 右側を入れる
+    st.insert(A[R]);
+
+    debug(R);
+    debug(L);
+    debug(R-L+1);
+    chmax(ans, R-L+1);
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
-  }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
+  cout << ans << endl;
 }

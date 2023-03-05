@@ -60,8 +60,23 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
 
 int main() {
-  return 0;
+  // 初期化
+  int x=0, y=0;
+  for (auto i=1; i<=100; i++) {
+    // 今のxに直径を足したものが1500を超えたら
+    if (x+2*i > 1500) {
+      // xを0に戻して
+      x = 0;
+      // yに今の直径を足す
+      y += 2*i;
+    }
+    // 今の左端のx座標に半径を足した座標
+    // 今の上端のy座標に半径を足した座標
+    // を出力する
+    cout << i+x << " " << i+y << endl;
+    // 直径分を足す
+    x += 2*i;
+  }
 }

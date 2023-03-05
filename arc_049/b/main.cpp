@@ -60,32 +60,47 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+const int MAXN = 1010;
+int X[MAXN], Y[MAXN], C[MAXN];
+int N;
+
+// 時間tで全ての頂点が一箇所に集まることができるかという判定問題を考える
+// 時間t以内にi番目が動ける範囲は、
+// Xi,Yiを中心とする一辺の長さが2*t/C[i]のx軸、y軸に平行な正方形
+// この判定問題はある時間までは不可能で、ある時間以上は可能になるという単調性を持っている
+bool ok(double r) {
+  // 全てのiとjの組み合わせに対してiが動ける範囲と
+  // jが動ける範囲に共通部分があることが必要
+  for (int i = 0; i < N; i++) for (int j = i+1; j < N; j++) {
+    // iとjのy座標の差の絶対値
+    int dy = abs(Y[i]-Y[j]);
+    // r/C[i] + r/C[j]はt秒以内に各頂点がy方向に動ける距離の合計
+    // y方向のプラスかマイナスに各頂点が動いて、共通の範囲を作ることができるかどうか
+    // これがdyより小さければ実現不可能
+    if (dy > r/C[i] + r/C[j]) return false;
+    // iとjのx座標の差の絶対値
+    int dx = abs(X[i]-X[j]);
+    // r/C[i] + r/C[j]はt秒以内に各頂点がx方向に動ける距離の合計
+    // x方向のプラスかマイナスに各頂点が動いて、共通の範囲を作ることができるかどうか
+    // これがdxより小さければ実現不可能
+    if (dx > r/C[i] + r/C[j]) return false;
+  }
+  return true;
+}
 
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
+    cin >> N;
+    for (int i = 0; i < N; i++) {
+        cin >> X[i] >> Y[i] >> C[i];
     }
-  }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
+    double low = 0, high = 1e9;
+    for (int i = 0; i < 50; i++) {
+        const double med = (low+high)/2;
+        // 移動可能なら答えはこれ以下の時間に存在する
+        if (ok(med)) high = med;
+        // 不可能なら答えはこれ以上の時間に存在する
+        else low = med;
     }
-  }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
+    printf("%.10lf\n", high);
+    return 0;
 }

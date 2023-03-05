@@ -28,7 +28,7 @@ using pii = pair<int, int>;
 
 map<int, int> mp;
 long long mod = 1000000007;
-vector<ll> G[1 << 18];
+// vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
 // #include <atcoder/all>
@@ -57,100 +57,48 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+int main() {
+  int m;
+  cin >> m;
+  vector<int> G[10];
+  int u, v;
+  for(int i = 1; i <= m; i++){
+    cin >> u >> v;
+    G[u].push_back(v);
+    G[v].push_back(u);
   }
-  return s;
-}
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
+  // 9を空の頂点として扱う
+  int p; string s = "999999999";
+  for(int i = 1; i <= 8; i++){
+    cin >> p;
+    s[p-1] = i + '0';
   }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
-
-int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
+  queue<string> Q;
+  Q.push(s);
+  // 今のパズルの状態と、その状態になるまでの手数
+  map<string, int> mp;
+  mp[s] = 0;
+  // 状態数は9!通りなので、BFSで探索できる(9! = 362880通り)
+  // 典型的な考え方として状態数が少ない時はBFSで全探索することができる
+  while(Q.size()){
+    string s = Q.front(); Q.pop();
+    // 9の位置を探す
+    for(int i = 1; i <= 9; i++) if(s[i-1] == '9') v = i;
+    // 9と隣接するマスを全探索(9は空の頂点)
+    for(auto u : G[v]){
+      // 9と隣接するマスを入れ替える
+      string t = s;
+      swap(t[u-1], t[v-1]);
+      // 既に状態が出ていたらスルー
+      if(mp.count(t)) continue;
+      // 今の状態になるまでの手数を記録
+      mp[t] = mp[s] + 1;
+      // 次の探索候補
+      Q.push(t);
+    }
   }
-
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
-  }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
+  // 実現不可能なら-1を出力
+  if(mp.count("123456789") == 0) cout << -1 << endl;
+  else cout << mp["123456789"] << endl;
   return 0;
 }

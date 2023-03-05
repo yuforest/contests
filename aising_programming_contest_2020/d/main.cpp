@@ -64,58 +64,78 @@ inline bool chmin(T &a, T b) {
 }
 
 
-vector<ll>dx={1,-1,0,0,1,1,-1,-1};
-vector<ll>dy={0,0,1,-1,1,-1,1,-1};
-
-// dp[i][j]:= Aiまでのうち、すでにj個の要素をBの要素として選んだときの、ここまでの計算結果の最大値
-long long dp[2001][2001];
-const ll INF = ll(1e18);
+int N;
+string X;
+int cnt[201010];
 int main() {
-  int n,m;
-  cin>>n>>m;
-  vector<long long> a(n);
-  for(int i=0;i<n;i++) cin>>a[i];
-  dp[0][0]=0;
-  dp[0][1]=-1000000000000000000ll;
-  for(int i=1;i<=n;i++){
-    for(int j=0;j<=n;j++){
-      // i個のうちまだ0個しか選んでいない
-      if(j==0) dp[i][0] = 0;
-      // i個以上多くは選べないのでマイナスの値を入れておく
-      else if(j > i) dp[i][j] = -1000000000000000000ll;
-      // dp[i−1][j] は AiをBの要素として選ばなかった場合であり、
-      // dp[i−1][j−1]+j×AiはAiを B の j 番目の要素として選んだ場合となります
-      // もらうDP
-      else dp[i][j] = max(dp[i-1][j], dp[i-1][j-1]+a[i-1]*j);
-    }
+  cin >> N >> X;
+
+  // popcountの結果の最大値はNなので、1回操作を行うだけでN以下の数にすることができる
+  // nが[1, 2*10^5]の場合に0にかかる時間はわかるのでDPで前計算しておく
+  rep3(i, 1, 201010) {
+    int pp = __builtin_popcount(i);
+    // iに対して操作を行ったときに0になる回数
+    // は、iをその数のpopcountで割ったあまりに対して操作を行ったときの回数に1を足したもの
+    cnt[i] = cnt[i % pp] + 1;
+    // debug(i, cnt[i]);
   }
-  cout << dp[n][m] << endl;
+
+  // 桁は下から見ていくのでreverseしておく
+  reverse(all(X));
+
+  int cn = 0;
+  // Xのpopcountを数える
+  rep(i, N) if (X[i] == '1') cn++;
+
+  // tot1 := 数N mod (cn + 1)
+  // tot2 := 数N mod (cn - 1)
+  int tot1 = 0, p1 = 1;
+  int tot2 = 0, p2 = 1;
+  rep(i, N) {
+    // フラグが立っている場合
+    if (X[i] == '1') {
+      // 今計算しているp1かp2を足してmodを取る
+      tot1 = (tot1 + p1) % (cn + 1);
+      if (2 <= cn) tot2 = (tot2 + p2) % (cn - 1);
+    }
+
+    // これはいつでもやる
+    // 桁上がりを考慮してmodを取る
+    p1 = (p1 * 2) % (cn + 1);
+    // cnが0,1のときはtot2は計算しない(0, -1で余りを取ることになるから)
+    if (2 <= cn) p2 = (p2 * 2) % (cn - 1);
+  }
+  debug(tot1);
+  debug(tot2);
+
+  vector<int> ans;
+  p1 = 1;
+  p2 = 1;
+  rep(i, N) {
+    // フラグが立っている場合(1->0にする場合)
+    if (X[i] == '1') {
+      // popcountが1のときは0になる
+      if (cn == 1) {
+        ans.push_back(0);
+      }
+      // それ以外の時は、tot2からp2を引いてcn-1でmodを取る
+      else {
+        int x = (tot2 - p2 + cn - 1) % (cn - 1);
+        ans.push_back(cnt[x] + 1);
+      }
+    }
+    // 立っていない場合(0->1にする場合)
+    else {
+      // tot1にp1を足してcn+1でmodを取る
+      int x = (tot1 + p1 + cn + 1) % (cn + 1);
+      ans.push_back(cnt[x] + 1);
+    }
+
+    // これはいつでもやる
+    p1 = (p1 * 2) % (cn + 1);
+    if (2 <= cn) p2 = (p2 * 2) % (cn - 1);
+  }
+  // 最後に戻す
+  reverse(all(ans));
+  rep(i, N) printf("%d\n", ans[i]);
 }
-
-
-// int main() {
-//   vvl dp(2001, vector<ll>(2001));
-//   int N, M;
-//   cin >> N >> M;
-//   vector<long long> A(N);
-//   rep(i, N) {
-//     rep(j, M) {
-//       if (j == 0) {
-//         dp[i][0] = 0;
-//       }
-//       dp[i+1][j+1] = max(dp[i][j+1], dp[i][j] + A[i] * (j+1));
-//     }
-//   }
-//   cout << dp[N][M] << endl;
-// }
-
-// n, m = map(int, input().split())
-// A = list(map(int, input().split()))
-// INF = 10**18
-// dp = [[-INF] * (m + 1) for _ in range(n + 1)]
-// for i in range(n):
-//     for j in range(m):
-//         if j == 0:
-//             dp[i][0] = 0
-//         dp[i + 1][j + 1] = max(dp[i][j + 1], dp[i][j] + A[i] * (j + 1))
-// print(dp[n][m])

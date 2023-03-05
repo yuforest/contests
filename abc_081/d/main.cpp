@@ -57,36 +57,45 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-ll N, H;
-ll A[100007], B[100007];
+int main(void){
+  int n;
+  cin >> n;
+  vector<int> a(n+1);
 
-int main(){
-  cin >> N >> H;
-  rep(i, N) {
-    cin >> A[i] >> B[i];
+  for (int i = 1; i < n + 1; i++){
+    cin >> a[i];
   }
-  ll ma = 0;
-  // 振る刀を選ぶ
-  rep(i, N) ma = max(ma, A[i]);
 
-  vector<ll> v;
-  // 投げる刀を選ぶ
-  rep(i, N) if (ma < B[i]) v.push_back(B[i]);
-  // 大きい順にソート
-  sort(v.begin(), v.end(), greater<int>());
+  cout << 2*n-1 << endl;
 
-  ll ans = 0;
-  fore(x, v) {
-    ans++;
-    H -= x;
-    if (H <= 0) {
-      cout << ans << endl;
-      return 0;
+  // 最大値の絶対値を持つ要素を探す
+  int absmax = 0, id = 1;
+  for (int i = 1; i < n + 1; i++){
+    if (abs(absmax) < abs(a[i])){
+      absmax = a[i];
+      id = i;
     }
   }
-  // 繰り上げ計算
-  ans += (H + ma - 1) / ma;
-  cout << ans << endl;
 
+  // 最大の絶対値を持つ要素を全ての要素に加算する
+  // これによって全ての要素が0以上もしくは0以下になる
+  for (int j = 1 ; j < n + 1; j++){
+    cout << id << " " << j << endl;
+  }
+
+  // 最大値の要素が0以下の時nから2までの要素を前の要素に足す
+  // 逆の累積和を作ることによって先頭に行くほど要素が小さくなる
+  if (a[id] < 0){
+    for (int i = n; i > 1; i--){
+      cout << i << " " << i - 1 << endl;
+    }
+  }
+  // 最大値の要素が0以上の時は1からn-1までの要素を次の要素に足す
+  // つまり累積和を作る
+  else{
+    for (int i = 1; i < n; i++){
+      cout << i << " " << i + 1 << endl;
+    }
+  }
   return 0;
 }

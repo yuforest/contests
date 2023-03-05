@@ -28,11 +28,12 @@ using pii = pair<int, int>;
 
 map<int, int> mp;
 long long mod = 1000000007;
+long long mod2 = 998244353;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-// #include <atcoder/all>
-// using namespace atcoder;
+#include <atcoder/all>
+using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -56,8 +57,39 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
 int main() {
+  int tc;
+  cin >> tc;
+  while(tc>0){
+    tc--;
+    int n;
+    string s;
+    cin >> n >> s;
+    long long cres=0;
+    // 争点の文字列
+    string target=s;
+    int p=0,q=n-1;
+    while(p<q){
+      // 後半の文字を前半に変更
+      target[q]=target[p];
+      p++;q--;
+    }
+    // 辞書順で争点以下の回文がいくつあるか
+    // 奇数なら中央の文字まで、偶数なら前半部分
+    // 2で割った時の切り捨てが最後になる
+    int last=(n-1)/2;
+    for(int i=0;i<=last;i++){
+      // 26進数と同じ
+      cres*=26;
+      cres%=mod2;
+      cres+=(s[i]-'A');
+      cres%=mod2;
+      debug(cres);
+    }
+    cres++;cres%=mod2;
+    // 争点の方がsより大きいなら、1引く
+    if(s<target){cres+=(mod2-1);cres%=mod2;}
+    cout << cres << '\n';
+  }
   return 0;
 }

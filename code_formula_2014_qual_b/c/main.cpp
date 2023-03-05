@@ -62,72 +62,54 @@ inline bool chmin(T &a, T b) {
 }
 const ll INF = ll(1e18);
 
-// ll N_size;
-// string bi_N = "";
-// set<ll> ans;
-// ll N;
+// cはスワップする回数
+// 6文字で最大スワップ回数が3回であればスワップする箇所を全探索すれば良い、
+// 最大15*3=45回程度
+bool dfs(string &a, string &b, int c){
+  // カウントが0になった時にaとbが同じ文字になっているか
+  if(c == 0) return a == b;
 
-// bool used[61];
-// void dfs(ll current, ll digit) {
-//   if (bi_N[digit] == '1') {
-//     debug(digit);
-//     ll tmp = current + powl(2, digit);
-//     if (tmp <= N) ans.insert(tmp);
-//     if (digit+1 < N_size) {
-//       dfs(tmp, digit+1);
-//     }
-//   }
-//   if (current <= N) ans.insert(current);
-//   if (digit+1 < N_size) {
-//     dfs(current, digit+1);
-//   }
-// }
+  // iとi文字以下をスワップ
+  rep(i, a.size()) rep(j, i){
+    // スワップしてから
+    swap(a[i], a[j]);
+    // 再起的に探索して
+    if(dfs(a, b, c - 1)) return true;
+    // もとに戻す
+    swap(a[i], a[j]);
+  }
+  // 全部試してもうまくいかなければfalse
+  return false;
+}
 
-// int main() {
-//   cin >> N;
+int main(){
+  string a, b; cin >> a >> b;
+  const int n = a.size();
 
-//   ll tmp_N = N;
-//   while(tmp_N > 0) {
-//     bi_N += to_string(tmp_N % 2);
-//     tmp_N /= 2;
-//   }
-//   debug(bi_N);
-//   N_size = bi_N.size();
-//   debug(N_size);
-//   dfs(0, 0);
-
-
-//   fore(x, ans) {
-//     cout << x << endl;
-//   }
-//   return 0;
-// }
-
-
-// bit全探索でも解ける
-int main() {
-  ll N;
-  cin >> N;
-  vl digits;
-  rep(i, 61){
-    if (N & (1LL << i)) {
-      digits.push_back(i);
+  string c, d;
+  map<char, int> m;
+  bool same = false;
+  rep(i,n){
+    // 異なる文字をc,dに追加していく
+    if(a[i] != b[i]){
+      c += a[i];
+      d += b[i];
+    }else{
+      // 文字をカウントして同じ文字が2つ以上あればsameをtrueに
+      if(++m[a[i]] >= 2) same = true;
     }
   }
-  debug(digits);
-  int K = digits.size();
-  vl ans;
-  rep(msk, (1LL << K)) {
-    ll tmp = 0;
-    rep(i, K) {
-      if (msk & (1LL << i)) {
-        // tmp += (1LL << digits[i]);
-        tmp += powl(2, digits[i]);
-      }
-    }
-    ans.push_back(tmp);
-  }
-  rep(i, ans.size()) {
-    cout << ans[i] << endl;
-  }
+
+  bool ans = false;
+  // 6文字以下で3回で揃えることができるか
+  ans |= (int)c.size() <= 6 && dfs(c, d, 3);
+  // 4文字以下が異なり、同じ文字が2つ以上あり、2回で揃えることができるか
+  ans |= same && (int)c.size() <= 4 && dfs(c, d, 2);
+  // 2文字以下が異なり、同じ文字が2つ以上あり、1回で揃えることができるか
+  ans |= same && (int)c.size() <= 2 && dfs(c, d, 1);
+  // 全く同じ文字列で、同じ文字が2つ以上あれば問題ない
+  ans |= same && (int)c.size() <= 0;
+  puts(ans ? "YES" : "NO");
+
+  return 0;
 }

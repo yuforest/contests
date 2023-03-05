@@ -60,32 +60,34 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
+vl x, y;
+bool ok(int i, int j, int k) {
+  ll x1 = x[i];
+  ll y1 = y[i];
+  ll x2 = x[j];
+  ll y2 = y[j];
+  ll x3 = x[k];
+  ll y3 = y[k];
+  ll S = abs((x2-x1)*(y3-y1)-(y2-y1)*(x3-x1));
+  debug(S);
+  if (S == 0) return false;
+  if (S % 2 == 1) return false;
+  return true;
+}
 
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
+  ll N;
+  cin >> N;
+  x.resize(N);
+  y.resize(N);
+  rep(i, N) cin >> x[i] >> y[i];
+  ll ans = 0;
+  rep(i, N) {
+    rep3(j, i+1, N) {
+      rep3(k, j+1, N) {
+        if (ok(i, j, k)) ans++;
       }
     }
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
-  }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
+  cout << ans << endl;
 }

@@ -57,100 +57,53 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-
-// 幅優先探索でも解ける
-// int main(){
-//   string s;
-//   cin >> s;
-
-//   map<string,int> mp;
-//   queue<string> q;
-
-//   mp[s]=0;
-//   q.push(s);
-
-//   while(!q.empty()){
-//     string current=q.front();q.pop();
-//     if(current=="atcoder"){
-//       cout << mp[current] << "\n";
-//       return 0;
-//     }
-
-//     for(int i=1;i<7;i++){
-//       string next=current;
-//       swap(next[i-1],next[i]);
-//       if(mp.find(next)==mp.end()){
-//         q.push(next);
-//         mp[next] = mp[current]+1;
-//       }
-//     }
-//   }
-//   return 0;
-// }
-
-
-vector<int> bit;
-int sum(int i){
-  int s = 0;
-  while(i>0){
-    s += bit[i];
-    i -= i & (-i);
+// 鳩ノ巣原理
+// 201 個の数列を、含まれる要素の総和を 200 で割った余りという 200 個のグループに分けるとき、
+// 2 個以上の数列を含んだグループが少なくとも 1 つ以上存在する
+// 200で割った余りにグルーピングするという少しおかしな制約に気付けるかがポイント
+void output(vector<int> &a){
+  cout << a.size();
+  for(auto &nx : a){
+    cout << ' ' << nx;
   }
-  return s;
+  cout << '\n';
 }
-
-void add(int i,int x){
-  while(i < bit.size()){
-    bit[i] += x;
-    // iの最後の1bitを足している
-    i += i & (-i);
-  }
-}
-
-// bubblesortでも解ける
-// int ans = 0;
-// vi bubblesort(vector<int> array,int size){
-// 	for(int i = 0; i < size; i++){
-// 		for(int j = i + 1; j < size; j++){
-// 			if(array[i] > array[j]){
-// 				int number = array[i];
-// 				array[i] = array[j];
-// 				array[j] = number;
-//         ans++;
-// 			}
-// 		}
-// 	}
-//   return array;
-// }
 
 int main(){
-  bit.resize(10);
-  for(int i=0;i<10;i++) {
-    bit[i]=0;
-  }
+  // 入力
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  for(auto &nx : a){cin >> nx;}
 
-  string s;
-  cin >> s;
-  map<char,int> mp;
-  string atc="*atcoder";
-  // mapの各文字に対して何文字目なのかという情報が入る
-  for(int i=1;i<=7;i++){
-    mp[atc[i]] = i;
+  vector<vector<int>> bk(200,vector<int>(0));
+  // 8とnの小さい方、2^8=256でこれだけ探索すれば、
+  int cnt = min(n,8);
+  // bit全探索,全く選ばないということはないので1からスタート
+  for(int i=1;i<(1<<cnt);i++){
+    int sig=0;
+    // 現在の数列を保存する用の配列
+    vector<int> s;
+    for(int j=0;j<cnt;j++){
+      if(i&(1<<j)){
+        s.push_back(j+1);
+        // この数字を選んだ時の和を200で割った余りを計算する
+        sig+=a[j];
+        sig%=200;
+      }
+    }
+    // この時点で既に余りがsigの箇所に数列があれば、実現可能なので
+    // その数列とsigを出力する
+    if(bk[sig].size()!=0){
+      cout << "Yes\n";
+      output(bk[sig]);
+      output(s);
+      return 0;
+    }
+    // 現時点で0個なら保存しておく
+    else{bk[sig]=s;}
   }
-  vector<int> a = {-1};
-  // 入力された文字がatcoderの何文字目なのかという情報
-  for(int i=0;i<7;i++) {
-    a.push_back(mp[s[i]]);
-  }
-  // a = bubblesort(a, 8);
-
-  int res = 0;
-  for(int i = 1;i<=7;i++){
-    // BITの総和 - 自分より左側 = 自分より右側
-    res += (i-1-sum(a[i]));
-    // 自分の位置に1を足す
-    add(a[i], 1);
-  }
-  cout << res << "\n";
+  // 最後まで見つけられなければ実現不可能
+  cout << "No\n";
   return 0;
 }

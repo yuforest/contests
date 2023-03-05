@@ -62,6 +62,20 @@ inline bool chmin(T &a, T b) {
 
 int ans[2010];
 
+// それまでの出目はスコアに影響しないので、スコアの期待値の最大値は残りのターン数にのみ依存
+// ダイスの出た目/6が現在の期待値/6より低ければ、前回の期待値/6を使った方がよく
+// 高ければ降り直したダイスの目を使った方が良い
 int main() {
+  int n;
+  scanf("%d",&n);
+  double ans=3.5;
+  // 2回目以降の試行
+  for(int i=1;i<n;i++){
+    double ans2=0;
+    // 前回の期待値と今の期待値の大きい方を取る
+    for(int d=1;d<=6;d++) ans2 += max(ans, (double)d)/6;
+    ans = ans2;
+  }
+  printf("%.10f\n",ans);
   return 0;
 }

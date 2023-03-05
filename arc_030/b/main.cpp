@@ -59,33 +59,50 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
+ll h[111];
+ll sz[110];
 
-int ans[2010];
+ll solve(ll cur, ll par){
+  sz[cur] = h[cur];
+  ll ret = 0;
+  // 繋がっている頂点を探索
+  rep(i, G[cur].size()) {
+    // 親の時は探索しない
+    if (G[cur][i] == par) continue;
+    // 探索の結果を加算
+    // これは繋がっている頂点以下で宝石がある
+    ret += solve(G[cur][i], cur);
+    // 現在の値に子の探索結果を足す、solveで入れた子のszの値を親に伝播していく
+    sz[cur] += sz[G[cur][i]];
+  }
+  // 現在が親の時は数えない
+  // 今の頂点から1つ根の方向に戻る経路を足している
+  // ここでsz[cur]が0、つまり宝石がない頂点の場合は足されないので
+  // その頂点を訪問するカウントをしていないのと同じことになる
+  // ある頂点の子に宝石がある場合は、その頂点も訪問する必要がある
+  // その判断はdfsで子を探索した時にszに入れた値を親に伝播していき
+  // ここでその値が0以上であるかどうかで判断できる
+  if(par != -1 && sz[cur]) ret++;
+  return ret;
+}
+int main(){
+  // 入力
+  ll n, x;
+  cin >> n >> x;
+  rep(i, n) cin >> h[i];
 
-int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
-    }
+  // グラフ構築(0-indexed)
+  rep(i, n-1) {
+    ll a,b;
+    cin >> a >> b;
+    a--;
+    b--;
+    G[a].push_back(b);
+    G[b].push_back(a);
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
-  }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
+  x--;
+  // 計算結果は片道分なので2倍すれば良い
+  // 根から葉の方向に行く分だけを計算している
+  // 最初は親がないので-1にしておく
+  cout << solve(x,-1) * 2 << endl;
 }

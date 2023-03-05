@@ -60,27 +60,51 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int main() {
-  string S;
-  int K;
-  cin >> S >> K;
 
-  for (int i = 0; i < S.size(); ++i) {
-    // 0~25までの値を取る、aの時は26%26=0になる
-    int con = ((int)('a' - S[i]) + 26) % 26;
-    if (con <= K) {
-      S[i] = 'a';
-      K -= con;
-    }
+vector<int> number(const string &s) {
+  vector<int> res(26);
+  // 数字の配列に変換する
+  for (char c : s) res[c-'A']++;
+  return res;
+}
 
-    // 最後の文字に来たら、K%26回分だけ操作する
-    if (i == (int)S.size()-1) {
-      K %= 26;
-      // ここでKは26より小さくなっている(0~25)
-      S.back() += K;
-    }
+// S1から取り出す文字数が少なすぎると、S2から取り出す文字数に関わらず、S3を構成するのに足りない
+// S1から取り出す文字数が多すぎると、S2から取り出す文字数に関わらず、S3を構成するのに余る
+// 取り出し方をアルファベットごとに独立して考えることができる
+// 上限と下限の間にあるかどうかで判定
+// 例えば下記のような場合には最低でもS1から4つ取る必要があり、3つより大きい
+// AAAAAB
+// CCCCCB
+// AAABCB
+string solve() {
+  string s1, s2, s3;
+  cin >> s1 >> s2 >> s3;
+  int N = s1.size() / 2;
+  vector<int> num1 = number(s1), num2 = number(s2), num3 = number(s3);
+  // S1から特定の文字をできるだけ少なく、またはできるだけ多く取り出したときに取り出す数の合計
+  int minimum = 0, maximum = 0;
+  // 文字ごとに見ていく
+  rep(i,26) {
+    // 足しても構築できなければ実現不可能
+    if (num1[i] + num2[i] < num3[i]) return "NO";
+    // できるだけ少なくS1から取り出した時(num3[i] - num2[i]個はS1から取り出す必要がある)
+    // 例えばどちらにもこの文字がない場合でもminimumにはnum3[i]が足される
+    minimum += max(0, num3[i] - num2[i]);
+    debug(max(0, num3[i] - num2[i]));
+    // できるだけ多くS1から取り出した時(num1[i]とnum3[i]の小さい方だけ取り出せる)
+    // S1現在の文字全てを使っても足りない場合にはnum1[i]だけ足される
+    maximum += min(num1[i], num3[i]);
+    debug(min(num1[i], num3[i]));
   }
-  cout << S << endl;
+  debug(minimum);
+  debug(maximum);
+  // S1から取り出す文字数はminimumとmaximumの範囲の全てを取ることができる
+  // Nがminimumとmaximumの範囲に収まっていればよい
+  if (minimum <= N && N <= maximum) return "YES";
+  return "NO";
+}
 
+int main() {
+  cout << solve() << endl;
   return 0;
 }

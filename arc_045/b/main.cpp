@@ -60,32 +60,37 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-
 int main() {
-  string S[10];
-  rep(i, 10) cin >> S[i];
-  int A = -1;
-  int B = -1;
-  int C = -1;
-  int D = -1;
-  rep(i, 10) {
-    rep(j, 10) {
-      if (S[i][j] == '#' && A == -1) {
-        A = i;
-        C = j;
-      }
+  ll N, M;
+  cin >> N >> M;
+  vl imos(N+2, 0);
+  vl s(M), t(M);
+  rep(i, M) {
+    cin >> s[i] >> t[i];
+    imos[s[i]]++;
+    imos[t[i]+1]--;
+  }
+  rep3(i, 1, N+1) {
+    imos[i] += imos[i-1];
+  }
+  debug(imos);
+  vl is_one(N+2, 0);
+  rep3(i, 1, N+1) {
+    if (imos[i] == 1) is_one[i] = true;
+  }
+  debug(is_one);
+  rep3(i, 1, N+1) {
+    is_one[i] += is_one[i-1];
+  }
+  debug(is_one);
+  vl ans;
+  rep(i, M) {
+    if (is_one[s[i]-1] == is_one[t[i]]) {
+      ans.push_back(i+1);
     }
   }
-  for(int i = 9; i >= 0; i--) {
-    for(int j = 9; j >= 0; j--) {
-      if (S[i][j] == '#' && B == -1) {
-        B = i;
-        D = j;
-      }
-    }
+  cout << ans.size() << endl;
+  rep(i, ans.size()) {
+    cout << ans[i] << endl;
   }
-  cout << A + 1 << " " << B + 1 << endl;
-  cout << C + 1 << " " << D + 1 << endl;
-  return 0;
 }
