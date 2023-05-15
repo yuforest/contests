@@ -28,11 +28,11 @@ using pii = pair<int, int>;
 
 map<int, int> mp;
 long long mod = 1000000007;
-vector<ll> G[1 << 18];
+// vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -60,38 +60,58 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-using mint = modint998244353;
-#define M 200000
+template <class F> ll optimize(int low, int high, const F& f) {
+  while (high - low > 2) {
+    const int m1 = (low + high) / 2;
+    const int m2 = m1 + 1;
+    if (f(m1) < f(m2)) {
+      low = m1;
+    } else {
+      high = m2;
+    }
+  }
+  return f(low + 1);
+}
 
-// Kが1増えた時の差分を考える
-// 式に落とし込んでみると見えてくる
+void solve() {
+  int n, m;
+  cin >> n >> m;
+  // 最初A0=0, B0=0
+  ll a = 0, b = 0, ans = numeric_limits<ll>::min();
+  for (int i = 0; i < n; ++i) {
+    ll x, y;
+    cin >> x >> y;
+    // Aiの値を計算する
+    const auto f = [&](const int k) {
+      return a + b * k + x * k * (k + 1) / 2;
+    };
+    // xが正の時は、最大値はx=1の時か、yの時
+    // f(n+1)-f(n)=2an+a+bはnについて単純増加
+    // このときこの関数は単調増加なので、三分探索は不要
+    if (x > 0) {
+      ans = max(ans, f(1));
+      ans = max(ans, f(y));
+    } else {
+      // 三分探索で値を求める
+      // f(n+1)-f(n)=2an+a+bはnについて単純減少
+      ans = max(ans, optimize(0, y + 1, f));
+    }
+    // A[z(i)]の値、これはA[z(i-1)]+ΣB[z(i-1+k)](k=1~n)の値
+    // A[z(i-1)]+ΣB[z(i-1)+k](k=0~n)
+    // = A[z(i-1)] + Σ(B[z(i-1)]+xk)(k=1~n)
+    // = A[z(i-1)] + B[z(i-1)]*n + x*n(n+1)/2
+    a = f(y);
+    // b[z]の値、これは今の要素数を累積的に足していくもの
+    b += x * y;
+  }
+  cout << ans << '\n';
+}
+
 int main() {
-  int n,x;
-  mint d,s,ans;
-  cin>>n;
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)
-  fenwick_tree<mint> fw1(M+1);
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)×i
-  fenwick_tree<mint> fw2(M+1);
-  // K=0の時
-  s=0;
-  // 差分を計算しながら答えを求めていく
-  // 差分の値はfenwick_treeに保存する
-  for(int i=0;i<n;i++){
-    cin>>x;
-    // AKの話+Aiの和
-    // x以下にあるもの個数*xがAKの方が大きくなる時
-    // それ以上の個数*それぞれの値がAiの方が大きくなる時
-    d = fw1.sum(0,x+1)*mint(x) + fw2.sum(x+1,M+1);
-    // Kが1増えた時の差分を足していく
-    s = s + mint(2)*d + mint(x);
-    // (mint(i+1).inv().pow(2))がK^2の部分
-    cout<< (s*(mint(i+1).inv().pow(2))).val() <<"\n";
-    // xに1を足す
-    fw1.add(x,mint(1));
-    // xにxを足す
-    fw2.add(x,mint(x));
+  int t;
+  cin >> t;
+  while (t--) {
+    solve();
   }
   return 0;
 }

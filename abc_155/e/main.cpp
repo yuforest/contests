@@ -26,7 +26,6 @@ using vvb = vector<vector<bool>>;
 using vvvi = vector<vector<vector<int>>>;
 using pii = pair<int, int>;
 
-map<int, int> mp;
 long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
@@ -37,6 +36,8 @@ using namespace atcoder;
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
+#define per(i, b) per2(i, 0, b)
+#define per3(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
 #define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
@@ -60,38 +61,36 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-using mint = modint998244353;
-#define M 200000
 
-// Kが1増えた時の差分を考える
-// 式に落とし込んでみると見えてくる
-int main() {
-  int n,x;
-  mint d,s,ans;
-  cin>>n;
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)
-  fenwick_tree<mint> fw1(M+1);
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)×i
-  fenwick_tree<mint> fw2(M+1);
-  // K=0の時
-  s=0;
-  // 差分を計算しながら答えを求めていく
-  // 差分の値はfenwick_treeに保存する
-  for(int i=0;i<n;i++){
-    cin>>x;
-    // AKの話+Aiの和
-    // x以下にあるもの個数*xがAKの方が大きくなる時
-    // それ以上の個数*それぞれの値がAiの方が大きくなる時
-    d = fw1.sum(0,x+1)*mint(x) + fw2.sum(x+1,M+1);
-    // Kが1増えた時の差分を足していく
-    s = s + mint(2)*d + mint(x);
-    // (mint(i+1).inv().pow(2))がK^2の部分
-    cout<< (s*(mint(i+1).inv().pow(2))).val() <<"\n";
-    // xに1を足す
-    fw1.add(x,mint(1));
-    // xにxを足す
-    fw2.add(x,mint(x));
+string N;
+// 下i桁まで確定していて、次の桁に追加でd円払う必要がある時の使った紙幣の最小枚数
+int dp[1010101][2];
+
+int inf = INT_MAX / 2;
+int main(){
+  cin >> N;
+  reverse(all(N));
+
+  int n = N.length();
+  // 初期化
+  rep3(i, 0, n + 1) rep3(d, 0, 2) dp[i][d] = inf;
+  dp[0][0] = 0;
+  // 下の桁から確定させていく
+  rep3(i, 0, n) rep3(d, 0, 2) if (dp[i][d] != inf) {
+    // 今の桁の値
+    int c = N[i] - '0';
+    // 合計して10なら今の桁で追加で払う必要はなく、次の桁で1枚多く払う
+    if (c == 9 and d == 1) chmin(dp[i + 1][1], dp[i][d]);
+    else {
+      // d=1の時は今の桁で追加で払う必要がある
+      if (d == 1) c++;
+      // 次の桁で追加で払う必要がない
+      chmin(dp[i + 1][0], dp[i][d] + c);
+      // 次の桁で1枚多く払う
+      chmin(dp[i + 1][1], dp[i][d] + 10 - c);
+    }
   }
-  return 0;
+  // d=1の時は次の桁の分があるので1枚足している
+  int ans = min(dp[n][0], dp[n][1] + 1);
+  cout << ans << endl;
 }

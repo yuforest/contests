@@ -37,7 +37,6 @@ using namespace atcoder;
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
-#define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
 // 無くても困らない
@@ -46,9 +45,6 @@ using namespace atcoder;
 // 浮動小数点の誤差を考慮した等式ですが、使わずに済むなら使わない方が確実です
 #define EPS (1e-7)
 #define equal(a, b) (fabs((a) - (b)) < EPS)
-
-#define yes "Yes"
-#define no "No"
 
 // DPやlong longの最大値最小値更新で重宝します。
 template <typename T>
@@ -60,38 +56,57 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-using mint = modint998244353;
-#define M 200000
+// Ai >= AjかつBi <= Bjを満たす(i, j)の組は何個あるか？
+// 座標圧縮
+void comp(vector<int>&a){
+  set<int>s(a.begin(),a.end());
+  map<int,int>d;
+  int cnt=0;
+  for(auto x:s)d[x]=cnt++;
+  // aを書き換える
+  for(auto&x:a)x=d[x];
+}
 
-// Kが1増えた時の差分を考える
-// 式に落とし込んでみると見えてくる
-int main() {
-  int n,x;
-  mint d,s,ans;
-  cin>>n;
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)
-  fenwick_tree<mint> fw1(M+1);
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)×i
-  fenwick_tree<mint> fw2(M+1);
-  // K=0の時
-  s=0;
-  // 差分を計算しながら答えを求めていく
-  // 差分の値はfenwick_treeに保存する
+auto op=[](long long a,long long b){return a+b;};
+auto e=[](){return 0LL;};
+
+int main(){
+  int n;
+  cin >> n;
+  vector<int>a(n),b(n);
+  for(int i=0;i<n;i++)cin >> a[i];
+  for(int i=0;i<n;i++)cin >> b[i];
+  comp(a);
+  comp(b);
+  debug(a, b);
+
+  vector<pair<int,int>>c(n);
+  for(int i=0;i<n;i++)c[i]=make_pair(-a[i],b[i]);
+  // 昇順ソート
+  // Aの降順(マイナスを掛けるので)、Aが同じならBの昇順
+  sort(c.begin(),c.end());
+  debug(c);
+
+  segtree<long long, op, e>seg(n);
+
+  long long ans=0;
+  // Aiで降順になっているので、これまでにみたプレゼントは必ずAi >= Ajの条件を満たす
+  // iと対になって条件を満たすjの個数は、今までに見たプレゼントのうち、
+  // Bi<=Bjを満たすものの個数
+  // これはセグ木で管理できる
   for(int i=0;i<n;i++){
-    cin>>x;
-    // AKの話+Aiの和
-    // x以下にあるもの個数*xがAKの方が大きくなる時
-    // それ以上の個数*それぞれの値がAiの方が大きくなる時
-    d = fw1.sum(0,x+1)*mint(x) + fw2.sum(x+1,M+1);
-    // Kが1増えた時の差分を足していく
-    s = s + mint(2)*d + mint(x);
-    // (mint(i+1).inv().pow(2))がK^2の部分
-    cout<< (s*(mint(i+1).inv().pow(2))).val() <<"\n";
-    // xに1を足す
-    fw1.add(x,mint(1));
-    // xにxを足す
-    fw2.add(x,mint(x));
+    int cnt=1;
+    // i+1からnの中で、ペアが全く同じものがあるか調べて数える
+    while(i+1<n&&c[i]==c[i+1])cnt++,i++;
+    // Biの値を取り出す
+    int b = c[i].second;
+    // Bi以下の個数を数える
+    // cntがj、(cnt+seg.prod(0,b+1))がiを表している
+    // jは固定して、条件を満たすiの個数を数えている
+    ans+=cnt*(cnt+seg.prod(0,b+1));
+    debug(seg.prod(0,b+1));
+    // Biの個数を更新
+    seg.set(b,seg.get(b)+cnt);
   }
-  return 0;
+  cout << ans << endl;
 }

@@ -37,7 +37,6 @@ using namespace atcoder;
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
-#define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
 // 無くても困らない
@@ -46,9 +45,6 @@ using namespace atcoder;
 // 浮動小数点の誤差を考慮した等式ですが、使わずに済むなら使わない方が確実です
 #define EPS (1e-7)
 #define equal(a, b) (fabs((a) - (b)) < EPS)
-
-#define yes "Yes"
-#define no "No"
 
 // DPやlong longの最大値最小値更新で重宝します。
 template <typename T>
@@ -60,38 +56,43 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-using mint = modint998244353;
-#define M 200000
-
-// Kが1増えた時の差分を考える
-// 式に落とし込んでみると見えてくる
 int main() {
-  int n,x;
-  mint d,s,ans;
-  cin>>n;
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)
-  fenwick_tree<mint> fw1(M+1);
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)×i
-  fenwick_tree<mint> fw2(M+1);
-  // K=0の時
-  s=0;
-  // 差分を計算しながら答えを求めていく
-  // 差分の値はfenwick_treeに保存する
+  int n,q;
+  cin >> n >> q;
+  // 各グループのクラスの人数を管理する配列
+  vector<map<int,int>> cnt(n);
   for(int i=0;i<n;i++){
-    cin>>x;
-    // AKの話+Aiの和
-    // x以下にあるもの個数*xがAKの方が大きくなる時
-    // それ以上の個数*それぞれの値がAiの方が大きくなる時
-    d = fw1.sum(0,x+1)*mint(x) + fw2.sum(x+1,M+1);
-    // Kが1増えた時の差分を足していく
-    s = s + mint(2)*d + mint(x);
-    // (mint(i+1).inv().pow(2))がK^2の部分
-    cout<< (s*(mint(i+1).inv().pow(2))).val() <<"\n";
-    // xに1を足す
-    fw1.add(x,mint(1));
-    // xにxを足す
-    fw2.add(x,mint(x));
+    int c;
+    cin >> c;
+    c--;
+    cnt[i][c]=1;
   }
-  return 0;
+
+  dsu d(n);
+  while(q--){
+    int t,x,y;
+    cin >> t >> x >> y;
+    x--,y--;
+    if(t==1){
+      x=d.leader(x);
+      y=d.leader(y);
+      // 親が違うなら併合する
+      if(x!=y){
+        // マージすると新たな代表元を変える
+        int r=d.merge(x,y);
+        // xが代表元でなければyが代表元なのでswap
+        if(r!=x)swap(x,y);
+        // 代表元でない方を代表元に統合する
+        // 統合処理には要素数をkとしてO(klogN)かかる
+        // 最悪計算量はO(NlogN)
+        // しかし集団の大きさは移動ごとに2倍以上になるため、
+        // 各生徒について移動が行われる回数はO(logN)回以下
+        // 従ってクエリ1についての計算量の合計は高々O(N(logN)^2)になる
+        for(auto temp:cnt[y])cnt[x][temp.first]+=temp.second;
+      }
+    }else{
+      // xの代表元のyの人数を出力する
+      cout << cnt[d.leader(x)][y] << endl;
+    }
+  }
 }

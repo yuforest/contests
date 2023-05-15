@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -47,9 +47,6 @@ using namespace atcoder;
 #define EPS (1e-7)
 #define equal(a, b) (fabs((a) - (b)) < EPS)
 
-#define yes "Yes"
-#define no "No"
-
 // DPやlong longの最大値最小値更新で重宝します。
 template <typename T>
 inline bool chmax(T &a, T b) {
@@ -60,38 +57,59 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-using mint = modint998244353;
-#define M 200000
+constexpr ll INF = 1e18;
+const int MX = 3010;
 
-// Kが1増えた時の差分を考える
-// 式に落とし込んでみると見えてくる
+// dp[i][j][k] := (i, j) までの最大値で、今の行でk個取ったときの最大値
+ll dp[MX][MX][4];
+ll v[MX][MX];
+
 int main() {
-  int n,x;
-  mint d,s,ans;
-  cin>>n;
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)
-  fenwick_tree<mint> fw1(M+1);
-  // ((1≤j≤K−1かつ)Aj=iであるようなjの個数)×i
-  fenwick_tree<mint> fw2(M+1);
-  // K=0の時
-  s=0;
-  // 差分を計算しながら答えを求めていく
-  // 差分の値はfenwick_treeに保存する
-  for(int i=0;i<n;i++){
-    cin>>x;
-    // AKの話+Aiの和
-    // x以下にあるもの個数*xがAKの方が大きくなる時
-    // それ以上の個数*それぞれの値がAiの方が大きくなる時
-    d = fw1.sum(0,x+1)*mint(x) + fw2.sum(x+1,M+1);
-    // Kが1増えた時の差分を足していく
-    s = s + mint(2)*d + mint(x);
-    // (mint(i+1).inv().pow(2))がK^2の部分
-    cout<< (s*(mint(i+1).inv().pow(2))).val() <<"\n";
-    // xに1を足す
-    fw1.add(x,mint(1));
-    // xにxを足す
-    fw2.add(x,mint(x));
+  int R, C, K;
+  cin >> R >> C >> K;
+  rep(i, K) {
+    int r, c, val;
+    cin >> r >> c >> val;
+    --r, --c;
+    // 価値を記録
+    v[r][c] = val;
   }
+  // 初期化
+  rep(i, MX) rep(j, MX) rep(k, 4) dp[i][j][k] = -INF;
+  dp[0][0][0] = 0;
+
+  rep(i, R) {
+    rep(j, C) {
+      // これは、この行で取れるかどうかを考える(0,1,2個のとき新たに取れる)
+      for (int k = 2; k >= 0; --k) {
+        // 遷移できれば最大値更新
+        // kを増やさない時は取らないということ
+        if (dp[i][j][k] >= 0) {
+          chmax(dp[i][j][k + 1], dp[i][j][k] + v[i][j]);
+        }
+      }
+      rep(k, 4) {
+        if (dp[i][j][k] >= 0) {
+          // 次の行への遷移
+          if (i + 1 < R) {
+            // 取った個数は0にリセット
+            chmax(dp[i + 1][j][0], dp[i][j][k]);
+          }
+          // 次の列への遷移
+          if (j + 1 < C) {
+            // 取った個数はそのまま
+            chmax(dp[i][j + 1][k], dp[i][j][k]);
+          }
+        }
+      }
+    }
+  }
+  // debug(dp);
+
+  ll ans = -INF;
+  // 最後まできた時に、k個取っている最大値を探す
+  rep(k, 4) chmax(ans, dp[R - 1][C - 1][k]);
+  cout << ans << endl;
+
   return 0;
 }
