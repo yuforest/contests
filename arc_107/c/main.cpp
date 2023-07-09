@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-// #include <atcoder/all>
-// using namespace atcoder;
+#include <atcoder/all>
+using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -62,26 +62,79 @@ inline bool chmin(T &a, T b) {
 }
 const ll INF = ll(1e18);
 
-int main() {
-  int N;
-  cin>>N;
 
-  vector<int> p(N);
+using mint = modint998244353;
+const long long MOD = 998244353;
+long long fact(int x){
+  long long ans = 1;
+  for (int i = 1; i <= x; i++){
+    ans = ans * i % MOD;
+  }
+  return ans;
+}
 
-  for(int i=0;i<N;i++)cin>>p[i];
-
-  vector<int> cnt(N,0);
-
-  for(int i=0;i<N;i++){
-    for(int j=0;j<3;j++){
-      cnt[(p[i]-1-i+j+N)%N]++;
+int main(){
+  int N, K;
+  cin >> N >> K;
+  vector<vector<int>> a(N, vector<int>(N));
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j++){
+      cin >> a[i][j];
     }
   }
-
-  int ans = 0;
-  for(int i=0;i<N;i++)ans = max(ans,cnt[i]);
-
-  cout<<ans<<endl;
-
-  return 0;
+  long long ans = 1;
+  // 行swapしかできない場合の答え*列swapしかできない場合の答えが答えとなる
+  // 列swapをしても行swapの条件には一切影響がない
+  for (int d = 0; d < 2; d++){
+    vector<vector<int>> E(N);
+    for (int i = 0; i < N; i++){
+      for (int j = i + 1; j < N; j++){
+        bool ok = true;
+        // ある列か行に対して、要素の和がKを超えていたらダメ
+        for (int k = 0; k < N; k++){
+          if (a[i][k] + a[j][k] > K){
+            ok = false;
+          }
+        }
+        // 双方向に辺を張る
+        // このときスワップ可能なので、重複を避けるためにi < jとしている
+        if (ok){
+          E[i].push_back(j);
+          E[j].push_back(i);
+        }
+      }
+    }
+    vector<bool> used(N, false);
+    for (int i = 0; i < N; i++){
+      if (!used[i]){
+        used[i] = true;
+        int cnt = 1;
+        // BFSで連結成分のサイズを求める
+        queue<int> Q;
+        Q.push(i);
+        while (!Q.empty()){
+          int v = Q.front();
+          Q.pop();
+          // 隣接する頂点を見ていく
+          for (int w : E[v]){
+            if (!used[w]){
+              used[w] = true;
+              cnt++;
+              Q.push(w);
+            }
+          }
+        }
+        // 連結成分のサイズの階乗をかける
+        ans *= fact(cnt);
+        ans %= MOD;
+      }
+    }
+    // 行と列を入れ替えて同じことを行う
+    for (int i = 0; i < N; i++){
+      for (int j = i + 1; j < N; j++){
+        swap(a[i][j], a[j][i]);
+      }
+    }
+  }
+  cout << ans << endl;
 }

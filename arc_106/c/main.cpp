@@ -62,26 +62,43 @@ inline bool chmin(T &a, T b) {
 }
 const ll INF = ll(1e18);
 
-int main() {
-  int N;
-  cin>>N;
-
-  vector<int> p(N);
-
-  for(int i=0;i<N;i++)cin>>p[i];
-
-  vector<int> cnt(N,0);
-
-  for(int i=0;i<N;i++){
-    for(int j=0;j<3;j++){
-      cnt[(p[i]-1-i+j+N)%N]++;
+ll N, M;
+void input() {
+  cin >> N >> M;
+}
+void solve() {
+  // M<0の時高橋君のプログラムは最適解を出力するのでこの様なことは起こり得ない
+  // M=Nのとき青木君のプログラムが出力する値は必ず1以上となるのでこの様なことは起こり得ない
+  // M=N-1かつN>=2の時、M=N-1になるためには高橋君のプログラムがNとなり、
+  // 青木君のプログラムが出力する値が1になる必要がある
+  // しかし高橋君のプログラムが出力する値がNとなる様な入力は全ての区間が交わらないので、
+  // 青木君のプログラムが出力する値もNとなる、N>=2の時この様なことは起こり得ない
+  if(M < 0 or M == N or (N != 1 and M == N - 1)) {
+    cout << -1 << endl;
+    return;
+  }
+  cout << "1 10000000" << endl;
+  ll rest = N - 1;
+  // 大きな区間の中にM+1個の区間を互いに交わらないように配置する
+  // これによってこの区間で青木君が1つとる時に、高橋君はM+1個取ることができ
+  // 差をMにすることができる
+  if(M != 0) {
+    for(int i = 1; i <= M + 1; i++) {
+      cout << 2 * i << " " << 2 * i + 1 << endl;
+      rest--;
     }
   }
+  // 10000000をbaseにして始める
+  const ll base = 1e8;
+  // rest分の区間を互いが交わらないように配置する
+  for(int i = 1; i <= rest; i++) {
+      cout << base + 2 * i << " " << base + 2 * i + 1 << endl;
+  }
+  return;
+}
 
-  int ans = 0;
-  for(int i=0;i<N;i++)ans = max(ans,cnt[i]);
-
-  cout<<ans<<endl;
-
+int main() {
+  input();
+  solve();
   return 0;
 }

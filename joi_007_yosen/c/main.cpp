@@ -61,34 +61,75 @@ int ans[2010];
 int N, M;
 
 int main() {
-  cin.tie(0)->sync_with_stdio(0);
-
-  int N;
+  ll N;
   cin >> N;
-  vector<pair<int, int>> A(N);
-  rep(i, N) cin >> A[i].first >> A[i].second;
-
-  // 各点をセットに挿入
-  set<pair<int, int>> st;
-  rep(i, N) st.insert(A[i]);
-
-  ll ans = 0;
-  // N^4だと間に合わないので二点を取得し、その二点に対して正方形を作れるような二点が
-  // 存在するかということを探索する
-  rep(i, N) rep(j, N) {
-    if (i == j) continue;
-
-    int dx = A[i].first - A[j].first;
-    int dy = A[i].second - A[j].second;
-
-    // iから見て正方形を作れるような座標を探索
-    if (st.find({A[i].first - dy, A[i].second + dx}) == st.end()) continue;
-    // jから見て正方形を作れるような座標を探索
-    if (st.find({A[j].first - dy, A[j].second + dx}) == st.end()) continue;
-
-    ll cur = ll(dx) * dx + ll(dy) * dy;
-    ans = max(ans, cur);
+  vl A(N);
+  rep(i, N) cin >> A[i];
+  sort(all(A));
+  vl B;
+  rep3(i, 1, 2*N+1) {
+    if (!binary_search(all(A), i)) B.push_back(i);
   }
-  cout << ans << "\n";
-  return 0;
+  debug(A);
+  debug(B);
+  ll ans = 0;
+  vl used(2*N+1);
+  used[0] = true;
+  ll turn = 0;
+  ll cur = 0;
+  ll a_count = N;
+  ll b_count = N;
+  while(true) {
+    if (a_count == 0 || b_count == 0) {
+      break;
+    }
+    if (turn == 0) {
+      ll idx = 0;
+      while (true) {
+        if (idx == A.size()) break;
+        if (used[A[idx]]) {
+          idx++;
+          continue;
+        }
+        if (A[idx] <= cur) {
+          idx++;
+          continue;
+        }
+        break;
+      }
+      if (idx == A.size()) {
+        cur = 0;
+      } else {
+        cur = A[idx];
+        used[cur] = true;
+        a_count--;
+      }
+    } else {
+      ll idx = 0;
+      while (true) {
+        if (idx == B.size()) break;
+        if (used[B[idx]]) {
+          idx++;
+          continue;
+        }
+        if (B[idx] <= cur) {
+          idx++;
+          continue;
+        }
+        break;
+      }
+      if (idx == B.size()) {
+        cur = 0;
+      } else {
+        cur = B[idx];
+        used[cur] = true;
+        b_count--;
+      }
+    }
+    debug(cur);
+    debug(used);
+    turn = 1 - turn;
+  }
+  cout << b_count << endl;
+  cout << a_count << endl;
 }

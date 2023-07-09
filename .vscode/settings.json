@@ -110,7 +110,9 @@
     "syncstream": "cpp",
     "filesystem": "cpp",
     "all": "cpp",
-    "stacktrace": "cpp"
+    "stacktrace": "cpp",
+    "expected": "cpp",
+    "spanstream": "cpp"
   },
   "editor.tabSize": 2
 }

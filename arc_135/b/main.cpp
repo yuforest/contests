@@ -60,38 +60,106 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-int ans[2010];
-int dx[4] = { 0, 1, 0, -1 }, dy[4] = { -1, 0, 1, 0 };
+// N=5
+// S[]=6 9 6 6 5
 
-int main() {
-  int H, W;
-  cin >> H >> W;
-  string S[H];
-  rep(i, H) cin >> S[i];
-  rep(h, H) {
-    rep(w, W) {
-      if (S[h][w] != '.') continue;
-      map<int, int> mp;
-      rep(i, 4) {
-        int hh = h + dx[i];
-        int ww = w + dy[i];
-        if (hh < 0 || hh > H-1) continue;
-        if (ww < 0 || ww > W-1) continue;
-        if (S[hh][ww] == '.') continue;
-        int num = S[hh][ww] - '0';
-        debug(num);
-        mp[num]++;
-      }
-      rep3(i, 1, 6) {
-        if (mp[i] > 0) continue;
-        S[h][w] = '0' + i;
-        break;
-      }
+// 5. 差分を出してみる。
+
+// id: 0   1   2   3   4   5   6
+// S:          6   9   6   6   5
+// S1-S0:         +3  -3   0  -1
+// A:  a   b   c  a+3 b-3  c  a+3-1 ...
+//    ~~~        ~~~~~       ~~~~~~~
+//    A0          A3           A6
+//              = S1-S0      = S4-S3
+
+// 7.
+// a)A0,A3,A6を求める
+// A[0] = 0 // 仮に0を置く。
+// A[3] = 3
+// A[6] = 2
+// が入る。
+// 最小値は0なので、A0,A3,A6に補正はいらない。
+
+// b)A1,A4を求める
+
+// A[1] = 0 // 0を仮入れ
+// A[4] = -3
+// 最小値は -3 だが、A>=0 でないといけないので、+3の補正を行う。
+
+// A[1] = 0+3
+// A[4] = -3+3
+
+// c)A2,A5を求める
+
+// A[2] = 0
+// A[5] = 0
+
+// これで、
+// A[0] = 0
+// A[1] = 3
+// A[2] = 0
+// A[3] = 3
+// A[4] = 0
+// A[5] = 0
+// A[6] = 2
+// が求まる。
+
+// 8. S[0] = 6 に合わせる。
+// A0+A1+A2 = 3なので、6-3の+3が調整値。
+
+// A0, A3, A6,...の差分さえあっていればいいので、
+// A[0] = 0+3
+// A[1] = 3
+// A[2] = 0
+// A[3] = 3+3
+// A[4] = 0
+// A[5] = 0
+// A[6] = 2+3
+
+// これが答え。
+
+ll S[300030];
+ll A[300030];
+ll N;
+
+void init_A(ll s){
+  ll now = 0;
+  ll low = 0;
+  for(ll i=s; i<N; i+=3){
+    now += S[i]-S[i-1];
+    A[i+2] = now;
+//    cout << "A[" << i+2 << "]:" << A[i+2] << endl;
+    chmin(low, now);
+  }
+  for(ll i=s-3; i<N; i+=3){
+    A[i+2] += abs(low);
+  }
+}
+
+int main(){
+
+  cin >> N;
+  rep(i, N){
+    cin >> S[i];
+  }
+  // 1-0, 4-3
+  init_A(1);
+  init_A(2);
+  init_A(3);
+  ll add = S[0] - (A[0]+A[1]+A[2]);
+  if (add < 0){
+    cout << "No" << endl;
+    return 0;
+  }
+//  cout << "add:" << add << endl;
+  cout << "Yes" << endl;
+  rep(i, N+2){
+    if (i%3 == 0){
+      A[i] += add;
     }
+    cout << A[i];
+    if (i<N+1) cout << " ";
+    else cout << endl;
   }
-  rep(i, H) {
-    cout << S[i] << endl;
-  }
-
-  return 0;
 }

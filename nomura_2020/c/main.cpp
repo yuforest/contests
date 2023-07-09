@@ -64,24 +64,56 @@ const ll INF = ll(1e18);
 
 int main() {
   int N;
-  cin>>N;
+  cin >> N;
+  vl A(N + 1);
+  vl suf(N + 2);
+  for (int i = 0; i <= N; ++i) cin >> A[i];
 
-  vector<int> p(N);
-
-  for(int i=0;i<N;i++)cin>>p[i];
-
-  vector<int> cnt(N,0);
-
-  for(int i=0;i<N;i++){
-    for(int j=0;j<3;j++){
-      cnt[(p[i]-1-i+j+N)%N]++;
+  // 深さ0の時
+  if (N == 0) {
+    if (A[0] == 1) {
+      cout << 1 << endl;
+      return 0;
+    } else {
+      cout << -1 << endl;
+      return 0;
     }
   }
 
-  int ans = 0;
-  for(int i=0;i<N;i++)ans = max(ans,cnt[i]);
+  // それ以外の時は深さ0の値は0である必要がある
+  if (A[0] > 0) {
+    cout << -1 << endl;
+    return 0;
+  }
 
-  cout<<ans<<endl;
+  // 木の下から見た時の深さiまでの葉の和を計算する
+  for (int i = N; i >= 0; --i) {
+    suf[i] = suf[i + 1] + A[i];
+  }
+
+  // xは深さd-1の頂点のうち葉ではないものの個数
+  ll x = 1;
+  // ansは頂点数の合計
+  ll ans = 1;
+
+  for (int i = 1; i <= N; ++i) {
+    // 深さd-1の頂点の中で葉ではないものを2倍しても
+    // 深さdの葉の数より少ない場合は不可能
+    if (x * 2 < A[i]) {
+      cout << -1 << endl;
+      return 0;
+    }
+    // 深さdの頂点数の最大値は深さd-1の葉ではない頂点の2倍と
+    // 下から見た時の葉の数の和の小さい方
+    ll d = min(x * 2, suf[i]);
+    debug(d);
+    ans += d;
+    // 頂点数の合計から葉であるものを引く
+    x = d - A[i];
+  }
+  debug(suf);
+
+  cout << ans << endl;
 
   return 0;
 }

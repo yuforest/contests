@@ -60,38 +60,15 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  int N;
+  ll N;
   cin >> N;
-  ll p[101];
-  rep(i, N) cin >> p[i];
-  // 0~99
-  vvb dp(101, vector<bool>(10001, false));
-  dp[0][0] = true;
-  rep(i, N) {
-    rep(j, 10001) {
-      if (dp[i][j]) {
-        // ポイントを獲得しない
-        dp[i+1][j] = true;
-        // i番目のポイントを獲得する
-        dp[i+1][j+p[i]] = true;
-      }
-
-      // [2,3,5]
-      // iが1から始める
-      // if (dp[i-1][j-p[i-1]]) {
-      //   // i = 1 -> 1問目まで解いた段階？
-      //   dp[i][j] = dp[i-1][j-p[i-1]];
-      // }
-    }
+  ll ans = 0;
+  ll val = 1000 - N;
+  vl coins = {500, 100, 50, 10, 5, 1};
+  rep(i, 6) {
+    ans += val / coins[i];
+    val %= coins[i];
   }
-  int ans = 0;
-  rep(i, 10001) {
-    if (dp[N][i]) {
-      debug(i);
-      ans++;
-    }
-  }
-  // dp[N][10000]
   cout << ans << endl;
-  return 0;
+
 }

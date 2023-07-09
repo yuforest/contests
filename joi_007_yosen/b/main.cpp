@@ -60,16 +60,19 @@ inline bool chmin(T &a, T b) {
 int ans[2010];
 
 int main() {
-  vvc S(4, vector<char>(4));
-  rep(i, 4) {
-    rep(j, 4) cin >> S[i][j];
-  }
-  for(int i = 3; i >= 0; i--) {
-    for(int j = 3; j >= 0; j--) {
-      if (j != 3) cout << " ";
-      cout << S[i][j] ;
+  string S;
+  cin >> S;
+  ll joi = 0;
+  ll ioi = 0;
+  rep(i, S.size()-2) {
+    if (S[i] == 'J' && S[i+1] == 'O' && S[i+2] == 'I') {
+      joi++;
     }
-    cout << endl;
+    if (S[i] == 'I' && S[i+1] == 'O' && S[i+2] == 'I') {
+      ioi++;
+    }
   }
+  cout << joi << endl;
+  cout << ioi << endl;
   return 0;
 }
