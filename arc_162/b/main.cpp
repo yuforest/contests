@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -60,31 +60,54 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
-    }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
-    }
+int popcount(long long N)
+{
+  int ans = 0;
+  while (N > 0) {
+    ans++;
+    // 最下位のbitのフラグを落とす
+    N ^= (N & -N);
   }
-  cout<<"No"<<endl;
+  return ans;
 }
-int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
+
+long long solve(long long N)
+{
+  debug(bitset<64>(N));
+  if (N < 7) return -1;
+
+  int k = popcount(N);
+  // 1が3個以上ある場合は上位から3つを残したものが答え
+  if (k >= 3) {
+    while (k > 3) {
+      k--;
+      // これで最下位のbitのフラグを落とす
+      N ^= (N & -N);
+    }
+    return N;
+    // 1がちょうど1つの場合は3つ右シフトして、最下位のbitのフラグを落とす
+    // その後7を残った分だけ左シフトして、最上位より小さいところのbitを3つ立てる
+  } else if (k == 1) return N / 8 * 7;
+  else {
+    // 1がちょうど2つの場合は、
+    // 下位の1が2以下であれば、2つの1を共に0にして、上位の1の直下に1を3つ並べたものが答え(下位のbitを落として1を2つ作れないため)
+    // 下位の1が4以上であれば、それを0にして直下に1を2個連続で並べたものが答え
+    // (N ^ (N & -N))はNの最下位bitを落としたもの
+    // (N & -N) / 4 * 3はNの最下位bitを2つ右シフトして、残った分だけ3を左シフトする
+    if ((N & -N) <= 2) return N / 8 * 7;
+    else return (N ^ (N & -N)) + (N & -N) / 4 * 3;
   }
+}
+
+int main()
+{
+  int i, j, k, l, T;
+  long long N;
+  scanf("%d", &T);
+  while (T--) {
+    scanf("%lld", &N);
+    printf("%lld\n", solve(N));
+  }
+  fflush(stdout);
+  return 0;
 }

@@ -37,6 +37,8 @@ using namespace atcoder;
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
+#define per(i, b) per2(i, 0, b)
+#define per3(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
 #define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
@@ -60,31 +62,31 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
-    }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
-    }
-  }
-  cout<<"No"<<endl;
-}
 int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
+  string S;
+  cin >> S;
+  string tmp = "";
+  vs A;
+  rep(i, S.size()) {
+    if (tmp == "" && S[i] >= 'A'  && S[i] <= 'Z') {
+      tmp += tolower(S[i]);
+    } else if (tmp != "" && S[i] >= 'A'  && S[i] <= 'Z') {
+      tmp += tolower(S[i]);
+      A.push_back(tmp);
+      tmp = "";
+    } else {
+      tmp += S[i];
+    }
   }
+  sort(all(A));
+  debug(A);
+  string ans = "";
+  fore(a, A) {
+    string tmp = a;
+    tmp[0] = toupper(tmp[0]);
+    tmp[tmp.size()-1] = toupper(tmp[tmp.size()-1]);
+    ans += tmp;
+  }
+  cout << ans << endl;
+  return 0;
 }

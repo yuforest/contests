@@ -37,6 +37,8 @@ using namespace atcoder;
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
 #define rep3(i,a,b) for(int i=a;i<b;i++)
+#define per(i, b) per2(i, 0, b)
+#define per3(i, a, b) for (int i = int(b) - 1; i >= int(a); i--)
 #define fore(i,a) for(auto &i:a)
 #define all(x) (x).begin(), (x).end()
 
@@ -60,31 +62,66 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
-    }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
-    }
-  }
-  cout<<"No"<<endl;
+int op(int a,int b){
+  return min(a,b);
 }
+
+int e(){
+  return 1e9;
+}
+
 int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
+  int n;
+  cin>>n;
+  vector<vector<int>> x(n);
+  rep(i,n){
+    int a,b,c;
+    cin>>a>>b>>c;
+    x[i] = {a,b,c};
+    // 配列内をソート
+    // 回転を行ってhi <= wi <= diとする
+    sort(x[i].begin(),x[i].end());
   }
+
+  rep(i,3){
+    vector<int> t(n);
+    rep(j,n) t[j] = x[j][i];
+    // 昇順ソート
+    sort(t.begin(),t.end());
+    // 重複要素を削除
+    t.erase(unique(t.begin(),t.end()),t.end());
+    rep(j,n){
+      // x][j][i]の値がtの何番目かを求める
+      // 数字が大きいので座標圧縮を行う
+      int d = distance(t.begin(),lower_bound(t.begin(),t.end(),x[j][i]));
+      x[j][i] = d;
+      // 真ん中を見ている時は、降順になるようにする
+      // hが等しい時に、wが降順になるようにソートすることで誤判定を防ぐ
+      // hi = hj, wi < wj, di = djの時、
+      // jの値を見ている時にiで格納した値を見つけてしまうのでYesになる
+      // wが降順になっていれば、jの値を見ている時にiで格納した値を見つけることはない
+      // よって誤判定を防ぐことができる
+      if(i==1)x[j][i] *= -1;
+    }
+  }
+  // 昇順ソート(真ん中は降順)
+  sort(x.begin(),x.end());
+
+  segtree<int,op,e> seg(n);
+  rep(i,n){
+    // 幅と奥行きを取得する
+    int a = -x[i][1],b = x[i][2];
+    // セグ木に格納されているものは高さの条件を満たしている
+    // 幅がa未満のの最小の奥行きが今の奥行きより小さければ良い
+    if(seg.prod(0,a)<b){
+      cout<<"Yes"<<endl;
+      return 0;
+    }
+    // セグ木の添字がwiの値がdiより大きいならばdiに置き換える
+    seg.set(a,min(seg.get(a),b));
+  }
+
+  cout<<"No"<<endl;
+
+  return 0;
 }

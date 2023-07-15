@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -50,6 +50,7 @@ using namespace atcoder;
 #define yes "Yes"
 #define no "No"
 
+
 // DPやlong longの最大値最小値更新で重宝します。
 template <typename T>
 inline bool chmax(T &a, T b) {
@@ -59,32 +60,56 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
+const ll INF = ll(1e18);
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
+void dfs(int cur,vector<string> &S,vector<string> &T,int remain,string ans){
+
+  // 残り文字が0以下になった箇所は枝切り
+  if(remain<0)return;
+
+  // Sを全て使い切った
+  // ベースケース
+  if(cur == S.size()) {
+    // 文字数制限を違反していない&&Tの中にはない文字列
+    if(ans.size() >= 3 && !binary_search(T.begin(),T.end(),ans)){
+      cout << ans << endl;
+      exit(0);
     }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
-    }
+    return;
   }
-  cout<<"No"<<endl;
+
+  // 必ず付けるアンスコ
+  if(ans.size() > 0 && ans.back()!='_'){
+    dfs(cur,S,T,remain,ans + "_");
+  } else{
+    dfs(cur+1,S,T,remain,ans + S[cur]);
+    // 残っている文字列は1減る
+    // Sが残っていない時には上で終わるのでここに戻ってこない
+    if(ans.size() > 0) dfs(cur,S,T,remain-1,ans + "_");
+  }
 }
 int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
+
+  int N,M;
+  cin>>N>>M;
+
+  vector<string> S(N);
+  for(int i=0;i<N;i++)cin>>S[i];
+  sort(S.begin(),S.end());
+
+  vector<string> T(M);
+  for(int i=0;i<M;i++)cin>>T[i];
+  sort(T.begin(),T.end());
+
+  int remain = 16;
+  for(int i=0;i<N;i++)remain -= S[i].size();
+  // 残っている文字数
+  remain -= N-1;
+
+  do{
+    dfs(0,S,T,remain,"");
   }
+  while(next_permutation(S.begin(),S.end()));
+  cout << -1 << endl;
+  return 0;
 }

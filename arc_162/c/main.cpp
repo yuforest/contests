@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -50,6 +50,7 @@ using namespace atcoder;
 #define yes "Yes"
 #define no "No"
 
+
 // DPやlong longの最大値最小値更新で重宝します。
 template <typename T>
 inline bool chmax(T &a, T b) {
@@ -59,32 +60,28 @@ template <typename T>
 inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
+const ll INF = ll(1e18);
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
-    }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
-    }
-  }
-  cout<<"No"<<endl;
-}
 int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
+  int N;
+  cin>>N;
+
+  vector<int> p(N);
+
+  for(int i=0;i<N;i++)cin>>p[i];
+
+  vector<int> cnt(N,0);
+
+  for(int i=0;i<N;i++){
+    for(int j=0;j<3;j++){
+      cnt[(p[i]-1-i+j+N)%N]++;
+    }
   }
+
+  int ans = 0;
+  for(int i=0;i<N;i++)ans = max(ans,cnt[i]);
+
+  cout<<ans<<endl;
+
+  return 0;
 }

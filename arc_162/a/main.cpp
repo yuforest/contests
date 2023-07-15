@@ -60,31 +60,29 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
-    }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
+int solve() {
+  int N;
+  cin >> N;
+  vector<int> P(N);
+  for(int& p : P) cin >> p;
+  int mn = INT_MAX;
+  int ans = 0;
+  // 後ろから見ていく
+  // 行きで自分より遅かったけれど、帰りで自分よりも順位が上の人がいたら
+  // 自分は区間賞を取れない
+  for(int i = N; i--; ) {
+    // 今の順位が今までの最小順位よりも小さいなら、
+    // 条件を満たす
+    if(P[i] < mn) {
+      debug(i+1, P[i]);
+      ans++;
+      mn = P[i];
     }
   }
-  cout<<"No"<<endl;
+  return ans;
 }
 int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
-  }
+  int T;
+  cin >> T;
+  while(T--) cout << solve() << '\n';
 }

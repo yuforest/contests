@@ -31,8 +31,8 @@ long long mod = 1000000007;
 vector<ll> G[1 << 18];
 
 // ACLです。使わない時はコメントアウトしています。導入方法はググってみてください。
-#include <atcoder/all>
-using namespace atcoder;
+// #include <atcoder/all>
+// using namespace atcoder;
 
 // 競プロerはrepマクロが大好き
 #define rep(i, n) for (int i = 0; i < (int)(n); i++)
@@ -60,31 +60,8 @@ inline bool chmin(T &a, T b) {
   return ((a > b) ? (a = b, true) : (false));
 }
 
-void solve(){
-  ll n;
-  cin>>n;
-  string s;
-  cin>>s;
-  // 2つに分割する方法を全探索
-  for(int i=0;i<n-1;i++){
-    string a,b;
-    // 2つに分割
-    for(int j=0;j<n;j++){
-      if(j<=i) a.push_back(s[j]);
-      else b.push_back(s[j]);
-    }
-    // 2つの文字列を比較
-    if(a<b){
-      cout<<"Yes"<<endl;
-      return;
-    }
-  }
-  cout<<"No"<<endl;
-}
+int ans[2010];
+
 int main() {
-  ll t;
-  cin>>t;
-  while(t--){
-    solve();
-  }
+  return 0;
 }
